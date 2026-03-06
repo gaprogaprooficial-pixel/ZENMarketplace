@@ -2,258 +2,279 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS UNIVERSE | Central Core</title>
+    <title>NEXUS UNIVERSE | OS CORE v4.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
-
-        :root {
-            --nexus-green: #00ffaa;
-            --nexus-blue: #00d4ff;
-            --nexus-void: #050505;
-        }
-
-        body {
-            background-color: var(--nexus-void);
-            color: white;
-            font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
+        
+        :root { --n-green: #00ffaa; --n-red: #ff3333; --n-blue: #00d4ff; }
+        body { background: #020202; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 255, 170, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-        }
-
-        .glow-text {
-            text-shadow: 0 0 10px var(--nexus-green);
-        }
-
-        /* Verificados Blindados Nexus */
-        .nexus-badge {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(45deg, var(--nexus-green), var(--nexus-blue));
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            margin-left: 8px;
-            animation: rotate-badge 3s linear infinite;
-        }
-
-        @keyframes rotate-badge {
-            from { filter: hue-rotate(0deg); }
-            to { filter: hue-rotate(360deg); }
-        }
-
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        .scanner-line {
-            width: 100%;
-            height: 2px;
-            background: var(--nexus-green);
-            position: absolute;
-            box-shadow: 0 0 15px var(--nexus-green);
-            animation: scan 4s ease-in-out infinite;
-            z-index: 10;
-            opacity: 0.3;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; }
-            50% { top: 100%; }
-            100% { top: 0%; }
-        }
-
-        .btn-nexus {
-            background: linear-gradient(90deg, #00ffaa33, #00d4ff33);
-            border: 1px solid var(--nexus-green);
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-        }
-
-        .btn-nexus:hover {
-            background: var(--nexus-green);
-            color: black;
-            box-shadow: 0 0 30px var(--nexus-green);
-            transform: translateY(-2px);
-        }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(0,255,170,0.1); }
+        .input-n { background: rgba(0,255,170,0.05); border: 1px solid rgba(0,255,170,0.2); padding: 10px; border-radius: 8px; color: var(--n-green); outline: none; font-size: 0.8rem; }
+        .badge { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .v-admin { color: #facc15; text-shadow: 0 0 5px #facc15; }
+        .v-user { color: var(--n-blue); text-shadow: 0 0 5px var(--n-blue); }
+        
+        /* Animaciones */
+        .scanline { width: 100%; height: 2px; background: var(--n-green); position: absolute; opacity: 0.2; animation: move 4s infinite linear; }
+        @keyframes move { 0% { top: 0; } 100% { top: 100%; } }
+        #app-shell { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="scanner-line"></div>
-    <div id="canvas-container"></div>
+<div class="scanline"></div>
 
-    <div class="relative z-20 h-screen flex flex-col p-8">
-        
-        <nav class="flex justify-between items-start mb-10">
-            <div class="flex items-center gap-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center text-4xl shadow-[0_0_20px_rgba(0,255,170,0.5)]">
-                    <span class="orbitron font-black text-black">N</span>
-                </div>
-                <div>
-                    <h1 class="orbitron text-4xl font-black tracking-tighter glow-text">NEXUS UNIVERSE</h1>
-                    <p class="text-xs tracking-[0.6em] text-cyan-400 uppercase font-light">Versión 2.0.6 | Motor Zen-Voxel</p>
-                </div>
-            </div>
-
-            <div class="glass p-4 rounded-3xl flex items-center gap-6">
-                <div class="text-right">
-                    <div class="flex items-center justify-end">
-                        <span class="font-bold text-white text-lg">PRO-BUILDER_01</span>
-                        <div class="nexus-badge"></div>
-                    </div>
-                    <span class="text-cyan-400 text-xs font-mono">152,430 ZEN-COINS</span>
-                </div>
-                <img src="https://ui-avatars.com/api/?name=PB&background=00ffaa&color=000" class="w-12 h-12 rounded-full border-2 border-cyan-400">
-            </div>
-        </nav>
-
-        <div class="flex-1 flex gap-8 overflow-hidden">
-            
-            <aside class="w-80 flex flex-col gap-4">
-                <div class="glass rounded-[30px] p-6 flex-1 overflow-y-auto">
-                    <h2 class="orbitron text-sm mb-6 text-gray-400">DISTRITOS ACTIVOS</h2>
-                    
-                    <div class="space-y-4">
-                        <div class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 hover:border-nexus-green transition-all">
-                            <img src="https://picsum.photos/300/150?random=1" class="w-full opacity-40 group-hover:scale-110 transition-transform">
-                            <div class="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
-                                <h3 class="font-bold">CYBER-STRIKE 2026</h3>
-                                <p class="text-[10px] text-cyan-400">42.5K JUGANDO</p>
-                            </div>
-                        </div>
-
-                        <div class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 hover:border-nexus-green transition-all">
-                            <img src="https://picsum.photos/300/150?random=2" class="w-full opacity-40 group-hover:scale-110 transition-transform">
-                            <div class="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
-                                <h3 class="font-bold">VOID RUNNER</h3>
-                                <p class="text-[10px] text-cyan-400">12.1K JUGANDO</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn-nexus p-6 rounded-3xl">CREAR NUEVO MUNDO</button>
-            </aside>
-
-            <main class="flex-1 flex flex-col gap-6">
-                <div class="glass flex-1 rounded-[40px] p-10 flex flex-col justify-end relative overflow-hidden">
-                    <div class="absolute top-10 left-10">
-                        <span class="bg-cyan-500/10 text-cyan-400 px-4 py-1 rounded-full text-xs border border-cyan-500/20 font-bold">MODO: PERSPECTIVA DE NÚCLEO</span>
-                    </div>
-
-                    <div class="max-w-2xl">
-                        <h2 class="orbitron text-5xl font-black mb-4 leading-tight italic">TU IMAGINACIÓN ES EL <span class="text-emerald-400">LÍMITE</span></h2>
-                        <p class="text-gray-400 mb-8 text-lg">Habla con el Arquitecto Nexus para generar mundos físicos, mecánicas complejas o avatares únicos instantáneamente.</p>
-                        
-                        <div class="flex gap-4">
-                            <input type="text" placeholder="Escribe aquí tu creación: 'Un planeta de cristal con gravedad cero...'" 
-                                   class="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl outline-none focus:border-nexus-green transition-all text-white">
-                            <button class="bg-nexus-green text-black px-10 rounded-3xl font-black orbitron text-sm">GENERAR</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="h-32 flex gap-6">
-                    <div class="glass flex-1 rounded-3xl p-4 flex items-center justify-around">
-                        <div class="text-center">
-                            <p class="text-[10px] text-gray-500 font-bold">FPS</p>
-                            <p class="orbitron text-xl text-nexus-green">144</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] text-gray-500 font-bold">LATENCIA</p>
-                            <p class="orbitron text-xl text-nexus-blue">2ms</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] text-gray-500 font-bold">RENDER</p>
-                            <p class="orbitron text-xl">VOXEL-MAX</p>
-                        </div>
-                    </div>
-                    <div class="glass w-96 rounded-3xl p-4 flex items-center justify-between px-8">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400">RECOMPENSAS DIARIAS</p>
-                            <p class="text-nexus-green font-bold">200 ZEN-C RECOLECTADOS</p>
-                        </div>
-                        <div class="text-3xl">💎</div>
-                    </div>
-                </div>
-            </main>
+<div id="login-gate" class="fixed inset-0 z-[100] flex items-center justify-center bg-black p-4">
+    <div class="max-w-4xl w-full glass p-8 rounded-[40px] border-t-4 border-[#00ffaa]">
+        <div class="text-center mb-6">
+            <h1 class="orbitron text-4xl font-black text-[#00ffaa] italic">NEXUS SECURE ACCESS</h1>
+            <p class="text-[10px] tracking-[0.5em] text-gray-500">AUTENTICACIÓN DE 10 FACTORES REQUERIDA</p>
         </div>
+
+        <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-3">
+                <p class="text-[10px] text-gray-400 uppercase">Identidad Cuántica</p>
+                <input type="email" id="log-g1" placeholder="GMAIL 1" class="input-n w-full">
+                <input type="email" id="log-g2" placeholder="GMAIL 2" class="input-n w-full">
+                <input type="password" id="log-p1" placeholder="CONTRASEÑA 1" class="input-n w-full">
+                <input type="password" id="log-p2" placeholder="CONTRASEÑA 2" class="input-n w-full">
+                <input type="text" id="log-user" placeholder="NOMBRE DE USUARIO" class="input-n w-full">
+            </div>
+            <div class="space-y-3">
+                <p class="text-[10px] text-gray-400 uppercase">Claves de Núcleo (Zen-99, Core-X, Null-0, Sync-8, Void-Z)</p>
+                <input type="text" id="k1" placeholder="KEY 1" class="input-n w-full">
+                <input type="text" id="k2" placeholder="KEY 2" class="input-n w-full">
+                <input type="text" id="k3" placeholder="KEY 3" class="input-n w-full">
+                <input type="text" id="k4" placeholder="KEY 4" class="input-n w-full">
+                <input type="text" id="k5" placeholder="KEY 5" class="input-n w-full">
+            </div>
+        </div>
+        <button onclick="validaAcceso()" class="w-full mt-8 bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron hover:shadow-[0_0_20px_#00ffaa] transition-all">INICIALIZAR SESIÓN</button>
     </div>
+</div>
 
-    <script>
-        // --- NEXUS 3D BACKGROUND ENGINE ---
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+<div id="app-shell" class="h-screen flex flex-col">
+    <header class="p-6 glass flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img id="u-img" src="" class="w-14 h-14 rounded-full border-2 border-[#00ffaa] cursor-pointer" onclick="openProfile()">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span id="u-name" class="font-black orbitron"></span>
+                    <span id="u-badge"></span>
+                </div>
+                <span id="u-status" class="text-[9px] text-gray-500 uppercase tracking-widest">Conectado al Núcleo</span>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <button id="admin-trigger" class="hidden bg-red-600/20 text-red-500 px-6 py-2 rounded-lg font-black text-xs border border-red-500/50" onclick="openAdmin()">ADMIN PANEL</button>
+            <button onclick="location.reload()" class="bg-white/5 px-4 py-2 rounded-lg text-xs">LOGOUT</button>
+        </div>
+    </header>
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
+    <main class="flex-1 flex overflow-hidden">
+        <section class="flex-1 flex flex-col bg-black/20 p-6">
+            <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-4"></div>
+            <div class="flex gap-4 p-4 glass rounded-2xl">
+                <input type="text" id="chat-in" placeholder="Escribe un mensaje en tiempo real..." class="flex-1 bg-transparent outline-none text-white font-mono" onkeypress="if(event.key=='Enter') sendChat()">
+                <button onclick="sendChat()" class="bg-[#00ffaa] text-black px-8 py-2 rounded-xl font-black text-xs">ENVIAR</button>
+            </div>
+        </section>
 
-        // Crear una malla de cubos (Voxels)
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const particlesCount = 300;
-        const voxels = [];
+        <aside class="w-80 glass p-6 border-l border-white/5">
+            <h3 class="orbitron text-xs text-gray-500 mb-6">SISTEMAS ACTIVOS</h3>
+            <div class="space-y-4">
+                <div class="p-4 bg-white/5 rounded-xl border-l-2 border-cyan-400">
+                    <p class="text-[10px] text-cyan-400 font-bold">ZENMAIL</p>
+                    <p class="text-xs mt-1">0 Mensajes nuevos</p>
+                </div>
+                <div class="p-4 bg-white/5 rounded-xl border-l-2 border-emerald-400">
+                    <p class="text-[10px] text-emerald-400 font-bold">LOCALIZACIÓN</p>
+                    <p class="text-xs mt-1">Nodo: Sector-G7</p>
+                </div>
+            </div>
+        </aside>
+    </main>
+</div>
 
-        for (let i = 0; i < particlesCount; i++) {
-            const material = new THREE.MeshBasicMaterial({ 
-                color: i % 2 === 0 ? 0x00ffaa : 0x00d4ff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.2
-            });
-            const cube = new THREE.Mesh(geometry, material);
-            
-            cube.position.x = (Math.random() - 0.5) * 50;
-            cube.position.y = (Math.random() - 0.5) * 50;
-            cube.position.z = (Math.random() - 0.5) * 50;
-            
-            cube.rotation.x = Math.random() * Math.PI;
-            cube.rotation.y = Math.random() * Math.PI;
-            
-            scene.add(cube);
-            voxels.push(cube);
-        }
+<div id="modal-profile" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md">
+    <div class="w-96 glass p-8 rounded-[30px] text-center">
+        <h2 class="orbitron mb-6">AJUSTES DE PERFIL</h2>
+        <input type="text" id="new-photo" placeholder="URL de nueva imagen" class="input-n w-full mb-4">
+        <button onclick="updateProfile()" class="bg-blue-600 w-full py-3 rounded-xl font-bold mb-3">ACTUALIZAR</button>
+        <button onclick="closeModal('modal-profile')" class="text-gray-500 text-xs">CERRAR</button>
+    </div>
+</div>
 
-        camera.position.z = 25;
+<div id="modal-admin" class="hidden fixed inset-0 z-[300] bg-[#050505] p-10 flex flex-col overflow-hidden">
+    <div class="flex justify-between items-center mb-10 border-b border-red-600/20 pb-6">
+        <h2 class="orbitron text-4xl text-red-600 font-black italic tracking-tighter">NEXUS ADMIN MASTER</h2>
+        <button onclick="closeModal('modal-admin')" class="bg-white/10 px-8 py-3 rounded-xl font-black">SALIR DEL PANEL</button>
+    </div>
+    
+    <div class="flex-1 overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-gray-500 text-[10px] uppercase border-b border-white/5">
+                    <th class="p-4">USUARIO</th>
+                    <th class="p-4">CREDENCIALES (Espionaje)</th>
+                    <th class="p-4">CONEXIÓN</th>
+                    <th class="p-4">ÚLTIMO CHAT</th>
+                    <th class="p-4">ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table"></tbody>
+        </table>
+    </div>
+</div>
 
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            voxels.forEach((cube, i) => {
-                cube.rotation.x += 0.001;
-                cube.rotation.y += 0.002;
-                cube.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
-            });
+<script>
+// --- DB SIMULADA ---
+const MASTER_USER = "Maestro_Nexus_2026";
+const MASTER_PASS = "NX-99#$K7!zQ_2026_@ROOT";
+const KEYS = ["ZEN-99", "CORE-X", "NULL-0", "SYNC-8", "VOID-Z"];
 
-            scene.rotation.y += 0.0005;
-            renderer.render(scene, camera);
-        }
+let users = JSON.parse(localStorage.getItem('nx_users')) || [];
+let chats = JSON.parse(localStorage.getItem('nx_chats')) || [];
+let currentUser = null;
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+// --- SEGURIDAD ---
+function validaAcceso() {
+    const u = document.getElementById('log-user').value;
+    const p1 = document.getElementById('log-p1').value;
+    const g1 = document.getElementById('log-g1').value;
+    const kMatch = KEYS.every((k, i) => document.getElementById(`k${i+1}`).value.toUpperCase() === k);
 
-        animate();
-    </script>
+    if (!u || !p1 || !g1 || !kMatch) return alert("FALLO EN AUTENTICACIÓN: DATOS INCOMPLETOS O CLAVES ERRÓNEAS");
+
+    let found = users.find(x => x.name === u);
+    if (found) {
+        if (found.isBan) return alert("ACCESO DENEGADO: ESTÁS BANEADO");
+        if (found.pass !== p1) return alert("CONTRASEÑA INCORRECTA");
+        currentUser = found;
+    } else {
+        // Registro si no existe
+        currentUser = {
+            id: 'NX-' + Math.floor(Math.random()*9999),
+            name: u, pass: p1, gmail: g1, 
+            photo: `https://ui-avatars.com/api/?name=${u}&background=random`,
+            isAdmin: (u === MASTER_USER && p1 === MASTER_PASS),
+            isVerified: (u === MASTER_USER),
+            isBan: false, lastIp: '192.168.1.' + Math.floor(Math.random()*255)
+        };
+        users.push(currentUser);
+    }
+    save();
+    enterApp();
+}
+
+function enterApp() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app-shell').style.display = 'flex';
+    document.getElementById('u-name').innerText = currentUser.name;
+    document.getElementById('u-img').src = currentUser.photo;
+    if(currentUser.isAdmin) document.getElementById('admin-trigger').style.display = 'block';
+    renderBadges();
+    renderChats();
+    setInterval(renderChats, 2000); // Polling para "tiempo real"
+}
+
+// --- CHAT ---
+function sendChat() {
+    const input = document.getElementById('chat-in');
+    if (!input.value.trim()) return;
+    chats.push({ 
+        user: currentUser.name, 
+        text: input.value, 
+        time: new Date().toLocaleTimeString(),
+        badge: getBadgeHTML(currentUser)
+    });
+    input.value = "";
+    save();
+    renderChats();
+}
+
+function renderChats() {
+    const box = document.getElementById('chat-box');
+    box.innerHTML = chats.map(c => `
+        <div class="animate-fade-in">
+            <span class="text-[10px] text-gray-600">${c.time}</span>
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-xs ${c.user === MASTER_USER ? 'v-admin' : 'v-user'}">${c.user}</span>
+                ${c.badge}
+            </div>
+            <p class="text-sm bg-white/5 p-3 rounded-xl mt-1 inline-block border border-white/5">${c.text}</p>
+        </div>
+    `).join('');
+    box.scrollTop = box.scrollHeight;
+}
+
+// --- ADMIN MASTER TOOLS ---
+function renderAdmin() {
+    const table = document.getElementById('admin-table');
+    table.innerHTML = users.map(u => {
+        const lastMsg = chats.filter(c => c.user === u.name).pop();
+        return `
+        <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
+            <td class="p-4 flex items-center gap-3">
+                <img src="${u.photo}" class="w-8 h-8 rounded-full">
+                <div><p class="font-bold text-xs">${u.name}</p><p class="text-[9px] text-gray-500">${u.id}</p></div>
+            </td>
+            <td class="p-4 text-xs font-mono">
+                <p class="text-emerald-400">PASS: ${u.pass}</p>
+                <p class="text-blue-400">MAIL: ${u.gmail}</p>
+            </td>
+            <td class="p-4 text-[10px]">IP: ${u.lastIp}</td>
+            <td class="p-4 text-[10px] italic text-gray-400">"${lastMsg ? lastMsg.text : 'Sin actividad'}"</td>
+            <td class="p-4">
+                <div class="flex gap-2">
+                    <button onclick="toggleVerify('${u.name}')" class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded text-[9px] font-black">${u.isVerified?'QUITAR V':'DAR VERIFICADO'}</button>
+                    <button onclick="toggleBan('${u.name}')" class="bg-red-500/20 text-red-400 px-3 py-1 rounded text-[9px] font-black">${u.isBan?'UNBAN':'BANEAR'}</button>
+                </div>
+            </td>
+        </tr>
+    `}).join('');
+}
+
+// --- ACCIONES ---
+function updateProfile() {
+    const url = document.getElementById('new-photo').value;
+    if(url) {
+        currentUser.photo = url;
+        users = users.map(u => u.name === currentUser.name ? currentUser : u);
+        document.getElementById('u-img').src = url;
+        save();
+        closeModal('modal-profile');
+    }
+}
+
+function toggleVerify(name) {
+    users = users.map(u => u.name === name ? {...u, isVerified: !u.isVerified} : u);
+    save(); renderAdmin();
+}
+
+function toggleBan(name) {
+    if(name === MASTER_USER) return alert("SISTEMA: No puedes banear al Creador");
+    users = users.map(u => u.name === name ? {...u, isBan: !u.isBan} : u);
+    save(); renderAdmin();
+}
+
+// --- UTILS ---
+function save() { 
+    localStorage.setItem('nx_users', JSON.stringify(users)); 
+    localStorage.setItem('nx_chats', JSON.stringify(chats)); 
+}
+function openAdmin() { document.getElementById('modal-admin').classList.remove('hidden'); renderAdmin(); }
+function openProfile() { document.getElementById('modal-profile').classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function getBadgeHTML(u) {
+    if(u.isAdmin) return '<span class="v-admin text-[10px]">★ ADMIN</span>';
+    if(u.isVerified) return '<span class="v-user text-[10px]">✔ VERIFICADO</span>';
+    return '';
+}
+function renderBadges() { document.getElementById('u-badge').innerHTML = getBadgeHTML(currentUser); }
+
+</script>
 </body>
 </html>
