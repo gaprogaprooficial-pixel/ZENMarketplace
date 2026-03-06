@@ -3,394 +3,354 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZenMail - Correo zen y simple</title>
+  <title>ZenMail • Correo Zen</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <style>
     :root {
       --primary: #0066ff;
-      --sidebar-bg: #f6f8fc;
-      --hover: #e8f0fe;
+      --bg: #fff;
       --text: #202124;
-      --text-secondary: #5f6368;
-      --danger: #d93025;
+      --text-sec: #5f6368;
+      --sidebar: #f6f8fc;
+      --hover: #e8f0fe;
+      --border: #dadce0;
     }
-
+    [data-theme="dark"] {
+      --primary: #8ab4f8;
+      --bg: #0f0f0f;
+      --text: #e8eaed;
+      --text-sec: #9aa0a6;
+      --sidebar: #202124;
+      --hover: #303134;
+      --border: #3c4043;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Roboto', sans-serif;
-      background:#fff; color:var(--text);
+      background:var(--bg); color:var(--text);
       height:100vh; overflow:hidden;
       display:flex; flex-direction:column;
+      transition:background 0.3s, color 0.3s;
     }
-
     header {
-      height:64px; background:#fff; border-bottom:1px solid #dadce0;
-      display:flex; align-items:center; padding:0 16px; gap:24px;
+      height:64px; background:var(--bg); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 16px; gap:20px;
     }
-
     .logo { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:500; color:var(--primary); }
-    .logo span { font-size:28px; }
-
     .search-container {
-      flex:1; max-width:720px; background:var(--hover); border-radius:40px;
+      flex:1; max-width:680px; background:var(--hover); border-radius:40px;
       padding:8px 16px; display:flex; align-items:center; gap:12px;
     }
-    .search-container input { border:none; background:transparent; flex:1; font-size:16px; outline:none; }
-
-    .header-icons { display:flex; gap:16px; align-items:center; }
-    .header-icons .material-icons { font-size:24px; color:var(--text-secondary); cursor:pointer; }
-    .profile { width:32px; height:32px; border-radius:50%; background:#8ab4f8; color:white; display:flex; align-items:center; justify-content:center; font-weight:500; cursor:pointer; }
-
+    .search-container input { border:none; background:transparent; flex:1; color:var(--text); outline:none; }
+    .profile-area { display:flex; align-items:center; gap:16px; }
+    .profile {
+      width:36px; height:36px; border-radius:50%; background:#8ab4f8; color:white;
+      display:flex; align-items:center; justify-content:center; font-weight:500; cursor:pointer;
+      position:relative;
+    }
+    .verified-badge {
+      position:absolute; bottom:-4px; right:-4px; width:16px; height:16px;
+    }
     .main { flex:1; display:flex; overflow:hidden; }
-
     aside {
-      width:280px; background:var(--sidebar-bg); border-right:1px solid #dadce0;
-      padding:12px 8px; overflow-y:auto;
+      width:260px; background:var(--sidebar); border-right:1px solid var(--border);
+      padding:16px 8px; overflow-y:auto;
     }
-
     .compose-btn {
-      background:var(--primary); color:white; border:none; border-radius:24px;
-      padding:12px 28px; font-size:15px; font-weight:500; margin:12px 16px 24px;
-      display:flex; align-items:center; gap:12px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.2);
+      width:100%; background:var(--primary); color:white; border:none; border-radius:24px;
+      padding:14px; font-size:15px; font-weight:500; margin-bottom:24px;
+      display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.15);
     }
-    .compose-btn:hover { box-shadow:0 4px 10px rgba(0,0,0,0.15); }
-
     .menu-item {
-      display:flex; align-items:center; gap:20px; padding:12px 24px; font-size:14px;
-      color:var(--text-secondary); border-radius:0 24px 24px 0; cursor:pointer; margin-right:8px;
+      display:flex; align-items:center; gap:20px; padding:12px 20px;
+      font-size:14px; color:var(--text-sec); border-radius:0 24px 24px 0;
+      cursor:pointer; margin-right:8px;
     }
     .menu-item:hover, .menu-item.active { background:var(--hover); color:var(--primary); }
-    .menu-item .material-icons { font-size:20px; }
-
-    .menu-separator { height:1px; background:#dadce0; margin:16px 0; }
-
     .email-content { flex:1; display:flex; flex-direction:column; }
-
-    .toolbar {
-      height:48px; border-bottom:1px solid #dadce0; display:flex; align-items:center;
-      padding:0 16px; gap:16px; background:#fff;
-    }
-
-    .email-list { flex:1; overflow-y:auto; background:#fff; }
-
+    .toolbar { height:48px; border-bottom:1px solid var(--border); padding:0 16px; display:flex; align-items:center; gap:16px; }
+    .email-list { flex:1; overflow-y:auto; }
     .email-row {
-      display:flex; align-items:center; padding:8px 24px; border-bottom:1px solid #f0f0f0;
+      display:flex; align-items:center; padding:10px 24px; border-bottom:1px solid var(--border);
       cursor:pointer; position:relative;
     }
-    .email-row:hover { background:#f8fcff; }
-    .email-row.unread { font-weight:500; background:#f8fcff; }
-
-    .email-checkbox { margin-right:16px; }
-    .email-star { margin-right:16px; color:#fbbc05; }
+    .email-row:hover { background:var(--hover); }
+    .email-row.unread { font-weight:500; }
     .email-from { width:220px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .email-subject { flex:1; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .email-snippet { color:var(--text-secondary); font-size:13px; margin-left:16px; flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .email-date { color:var(--text-secondary); font-size:13px; min-width:80px; text-align:right; }
-
+    .email-snippet { color:var(--text-sec); font-size:13px; margin-left:16px; flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .email-date { color:var(--text-sec); font-size:13px; min-width:80px; text-align:right; }
     .report-btn {
-      background:var(--danger); color:white; border:none; border-radius:4px;
-      padding:4px 10px; font-size:12px; cursor:pointer; margin-left:12px;
-      opacity:0; transition:opacity 0.2s;
+      background:#d93025; color:white; border:none; border-radius:4px;
+      padding:5px 10px; font-size:12px; cursor:pointer; margin-left:12px; opacity:0; transition:opacity 0.2s;
     }
-    .email-row:hover .report-btn { opacity:1; }
+    .email-row:hover .report-btn { opacity:0.9; }
 
-    /* Login & Admin */
-    #login-page {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(255,255,255,0.95); display:flex; align-items:center; justify-content:center; z-index:1000;
+    /* Modal Redactar */
+    #compose-modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:2000;
     }
-    .login-form { background:white; padding:32px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.1); width:320px; }
-    .login-form input { width:100%; padding:12px; margin:8px 0; border:1px solid #dadce0; border-radius:4px; }
-    .login-form button { width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:4px; cursor:pointer; }
-
-    #admin-panel { display:none; flex:1; padding:24px; background:#fff; overflow-y:auto; }
-    .user-table, .report-table { width:100%; border-collapse:collapse; margin-top:20px; }
-    .user-table th, .user-table td, .report-table th, .report-table td {
-      padding:12px; border-bottom:1px solid #dadce0; text-align:left;
+    .modal-content {
+      background:var(--bg); width:90%; max-width:680px; border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.4);
     }
-    .ban-btn {
-      padding:6px 12px; border:none; border-radius:4px; cursor:pointer;
-    }
-    .ban-btn.banned { background:#d93025; color:white; }
-    .ban-btn:not(.banned) { background:#1a73e8; color:white; }
+    .modal-header { padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .modal-body { padding:20px; }
+    .compose-to, .compose-subject { width:100%; padding:12px; margin-bottom:12px; border:1px solid var(--border); border-radius:4px; background:var(--hover); color:var(--text); }
+    #compose-body { width:100%; height:280px; padding:12px; border:1px solid var(--border); border-radius:4px; resize:none; background:var(--hover); color:var(--text); font-family:inherit; }
+    .format-bar { margin-bottom:12px; display:flex; gap:8px; }
+    .format-btn { background:var(--hover); border:1px solid var(--border); padding:6px 10px; border-radius:4px; cursor:pointer; }
 
-    .verified-badge { display:inline-block; margin-left:8px; vertical-align:middle; }
+    /* Admin Panel */
+    #admin-panel { display:none; flex:1; padding:24px; overflow-y:auto; }
+    table { width:100%; border-collapse:collapse; margin:20px 0; }
+    th, td { padding:12px; border-bottom:1px solid var(--border); text-align:left; }
+    .action-btn { padding:6px 12px; border:none; border-radius:4px; cursor:pointer; }
 
-    .main, header { display:none; }
-
-    @media (max-width:900px) {
-      aside { width:72px; }
-      aside .menu-item span:not(.material-icons) { display:none; }
-      .compose-btn { padding:12px; width:56px; justify-content:center; }
-      .search-container { max-width:400px; }
-    }
+    @media (max-width:900px) { aside { width:72px; } aside span:not(.material-icons) { display:none; } }
   </style>
 </head>
-<body>
+<body data-theme="light">
 
   <!-- Login -->
-  <div id="login-page">
-    <div class="login-form">
-      <h2>Inicia sesión en ZenMail</h2>
-      <input type="text" id="username" placeholder="Usuario (admin para panel)" />
-      <input type="password" id="password" placeholder="Contraseña" />
-      <button onclick="login()">Entrar</button>
-      <p style="margin-top:12px; font-size:13px;">Admin: <b>admin</b> / <b>X7pQ#9LmT$4vK2eR!8wZ</b></p>
+  <div id="login-page" style="position:fixed;inset:0;background:rgba(255,255,255,0.98);display:flex;align-items:center;justify-content:center;z-index:3000;">
+    <div style="background:var(--bg);padding:32px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.2);width:340px;">
+      <h2>ZenMail</h2>
+      <input type="text" id="username" placeholder="Usuario" style="width:100%;padding:12px;margin:12px 0;border:1px solid var(--border);border-radius:4px;"/>
+      <input type="password" id="password" placeholder="Contraseña" style="width:100%;padding:12px;margin:12px 0;border:1px solid var(--border);border-radius:4px;"/>
+      <button onclick="login()" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:4px;cursor:pointer;">Entrar</button>
+      <p style="margin-top:16px;font-size:13px;color:var(--text-sec);">Admin: <b>admin</b> • <b>X7pQ#9LmT$4vK2eR!8wZ</b></p>
     </div>
   </div>
 
   <header>
-    <div class="logo">
-      <span class="material-icons">auto_awesome</span>
-      ZenMail
-    </div>
+    <div class="logo"><span class="material-icons">auto_awesome</span>ZenMail</div>
     <div class="search-container">
       <span class="material-icons">search</span>
-      <input type="text" placeholder="Buscar en el correo"/>
+      <input type="text" placeholder="Buscar..."/>
     </div>
-    <div class="header-icons">
-      <span class="material-icons">help_outline</span>
-      <span class="material-icons">settings</span>
-      <span class="material-icons">apps</span>
-      <div class="profile">Z</div>
+    <div class="profile-area">
+      <div class="profile" id="profile" onclick="toggleTheme()">Z
+        <svg id="verified" class="verified-badge" width="18" height="18" viewBox="0 0 24 24" style="display:none;">
+          <circle cx="12" cy="12" r="10" fill="#1a73e8"/>
+          <path d="M9 16.2l-3.5-3.5 1.4-1.4 2.1 2.1 5.6-5.6 1.4 1.4z" fill="white"/>
+        </svg>
+      </div>
     </div>
   </header>
 
   <div class="main">
     <aside>
-      <button class="compose-btn">
-        <span class="material-icons">edit</span>
-        <span>Redactar</span>
+      <button class="compose-btn" onclick="openCompose()">
+        <span class="material-icons">edit</span> Redactar
       </button>
 
       <div class="menu-item active" onclick="showSection('inbox')">
-        <span class="material-icons">inbox</span>
-        <span>Bandeja de entrada</span>
+        <span class="material-icons">inbox</span> Bandeja
       </div>
-      <div class="menu-item" onclick="showSection('inbox')">
-        <span class="material-icons">star_border</span>
-        <span>Destacados</span>
-      </div>
-      <div class="menu-item" onclick="showSection('inbox')">
-        <span class="material-icons">send</span>
-        <span>Enviados</span>
+      <div class="menu-item" onclick="showSection('spam')">
+        <span class="material-icons">report</span> Spam / Reportados (<span id="spam-count">0</span>)
       </div>
 
-      <div class="menu-separator"></div>
+      <div class="menu-separator" style="height:1px;background:var(--border);margin:20px 0;"></div>
 
       <div class="menu-item" id="admin-menu" style="display:none;" onclick="showAdminPanel()">
-        <span class="material-icons">admin_panel_settings</span>
-        <span>Admin Panel</span>
+        <span class="material-icons">admin_panel_settings</span> Admin
       </div>
     </aside>
 
     <section class="email-content" id="email-content">
       <div class="toolbar">
-        <input type="checkbox" class="email-checkbox"/>
-        <span class="material-icons">refresh</span>
-        <span class="material-icons">more_vert</span>
+        <span class="material-icons">refresh" onclick="loadEmails()">refresh</span>
       </div>
-
-      <div class="email-list" id="email-list">
-        <!-- Los correos se generan dinámicamente abajo -->
-      </div>
+      <div class="email-list" id="email-list"></div>
     </section>
 
-    <!-- Admin Panel -->
     <section id="admin-panel">
-      <h2>Panel de Administración</h2>
-
+      <h2>Panel Admin</h2>
+      <button class="action-btn" style="background:#d93025;color:white;" onclick="clearReports()">Limpiar reportes</button>
       <h3>Usuarios</h3>
-      <table class="user-table">
-        <thead><tr><th>Usuario</th><th>Contraseña</th><th>Estado</th><th>Acción</th></tr></thead>
-        <tbody id="user-list"></tbody>
-      </table>
+      <table><thead><tr><th>Usuario</th><th>Pass (demo)</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="user-list"></tbody></table>
 
-      <h3 style="margin-top:40px;">Denuncias / Reportes</h3>
-      <table class="report-table">
-        <thead><tr><th>Denunciado por</th><th>Correo reportado</th><th>Motivo</th><th>Fecha</th></tr></thead>
-        <tbody id="report-list"></tbody>
-      </table>
+      <h3>Denuncias</h3>
+      <table><thead><tr><th>Por</th><th>Correo</th><th>Motivo</th><th>Fecha</th></tr></thead><tbody id="report-list"></tbody></table>
     </section>
   </div>
 
+  <!-- Modal Redactar -->
+  <div id="compose-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Nuevo mensaje</h3>
+        <span class="material-icons" onclick="closeCompose()" style="cursor:pointer;">close</span>
+      </div>
+      <div class="modal-body">
+        <input class="compose-to" placeholder="Para" id="compose-to"/>
+        <input class="compose-subject" placeholder="Asunto" id="compose-subject"/>
+        <div class="format-bar">
+          <button class="format-btn" onclick="formatText('bold')">B</button>
+          <button class="format-btn" onclick="formatText('italic')">I</button>
+        </div>
+        <textarea id="compose-body" placeholder="Escribe tu mensaje..."></textarea>
+        <button style="margin-top:16px;padding:12px 24px;background:var(--primary);color:white;border:none;border-radius:24px;cursor:pointer;" onclick="sendEmail()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ──────────────────────────────────────────────
-    // Datos persistentes (localStorage)
-    // ──────────────────────────────────────────────
     const usersKey = 'zenmail_users';
     const reportsKey = 'zenmail_reports';
+    const spamKey = 'zenmail_spam';
 
     if (!localStorage.getItem(usersKey)) {
       localStorage.setItem(usersKey, JSON.stringify([
-        { username: 'admin', password: 'X7pQ#9LmT$4vK2eR!8wZ', banned: false },
-        { username: 'user1', password: 'pass123', banned: false },
-        { username: 'user2', password: 'secure456', banned: true },
-        { username: 'user3', password: 'hello789', banned: false },
-        { username: 'user4', password: 'world000', banned: false },
-        { username: 'user5', password: 'zenmail111', banned: false }
+        {username:'admin', password:'X7pQ#9LmT$4vK2eR!8wZ', banned:false},
+        {username:'gapro', password:'demo123', banned:false}
       ]));
     }
-
-    if (!localStorage.getItem(reportsKey)) {
-      localStorage.setItem(reportsKey, JSON.stringify([]));
-    }
+    if (!localStorage.getItem(reportsKey)) localStorage.setItem(reportsKey, '[]');
+    if (!localStorage.getItem(spamKey)) localStorage.setItem(spamKey, '[]');
 
     let currentUser = null;
     let isAdmin = false;
 
-    // ──────────────────────────────────────────────
-    // Login
-    // ──────────────────────────────────────────────
     function login() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
       const users = JSON.parse(localStorage.getItem(usersKey));
-      const user = users.find(u => u.username === username && u.password === password);
+      const user = users.find(x => x.username === u && x.password === p);
 
-      if (user) {
-        if (user.banned) {
-          alert('Tu cuenta está baneada. Contacta al administrador.');
-          return;
-        }
-        currentUser = username;
-        isAdmin = (username === 'admin');
+      if (user && !user.banned) {
+        currentUser = u;
+        isAdmin = (u === 'admin');
         document.getElementById('login-page').style.display = 'none';
-        document.querySelector('header').style.display = 'flex';
-        document.querySelector('.main').style.display = 'flex';
-        if (isAdmin) {
-          document.getElementById('admin-menu').style.display = 'flex';
-        }
+        if (isAdmin) document.getElementById('admin-menu').style.display = 'flex';
+        if (u === 'admin' || u === 'gapro') document.getElementById('verified').style.display = 'block';
         loadEmails();
-        alert(`¡Bienvenido, ${username}!`);
       } else {
-        alert('Usuario o contraseña incorrectos.');
+        alert(user ? 'Cuenta baneada' : 'Credenciales incorrectas');
       }
     }
 
-    // ──────────────────────────────────────────────
-    // Cargar correos de ejemplo con botón denunciar
-    // ──────────────────────────────────────────────
-    function loadEmails() {
+    function loadEmails(section = 'inbox') {
       const list = document.getElementById('email-list');
       list.innerHTML = '';
 
-      const fakeEmails = [
-        { from: 'equipo@xai.com', subject: '¡Grok 4 en camino! 🚀', snippet: 'Nuevo modelo ultra potente...', date: '14:22', unread: true },
-        { from: 'example@zenmail.com', subject: 'Oferta especial solo para ti', snippet: '50% descuento en premium este mes...', date: '10:15', unread: true },
-        { from: 'netflix@notifications.com', subject: 'Tu serie vuelve pronto', snippet: 'Stranger Things final season...', date: '12 mar', unread: false },
-        { from: 'github noreply@github.com', subject: 'Tu repo tiene 100 estrellas', snippet: '¡Felicidades por zenmail clon!...', date: '10 mar', unread: false },
-        { from: 'promociones@zenmail.com', subject: 'Gana almacenamiento extra', snippet: 'Refiere amigos y gana 10GB...', date: 'ayer', unread: false }
+      let emails = [
+        {from:'equipo@xai.com', subject:'Grok 5 ya entrena', snippet:'Próximo salto cuántico...', date:'hoy', unread:true, reported:false},
+        {from:'example@zenmail.com', subject:'Oferta Premium', snippet:'Duplica tu espacio gratis...', date:'10:15', unread:true, reported:false},
+        {from:'noticias@elheraldo.co', subject:'Titulares Barranquilla', snippet:'Tráfico en la 30 hoy...', date:'ayer', unread:false, reported:false}
       ];
 
-      fakeEmails.forEach(email => {
+      const spam = JSON.parse(localStorage.getItem(spamKey));
+      document.getElementById('spam-count').textContent = spam.length;
+
+      if (section === 'spam') {
+        emails = spam;
+      }
+
+      emails.forEach((e, i) => {
         const row = document.createElement('div');
-        row.className = `email-row ${email.unread ? 'unread' : ''}`;
+        row.className = `email-row ${e.unread ? 'unread' : ''}`;
         row.innerHTML = `
-          <input type="checkbox" class="email-checkbox"/>
-          <span class="material-icons email-star">star_border</span>
-          <div class="email-from">${email.from}</div>
-          <div class="email-subject">${email.subject}</div>
-          <div class="email-snippet">${email.snippet}</div>
-          <div class="email-date">${email.date}</div>
-          <button class="report-btn" onclick="reportEmail('${email.from}', '${email.subject}')">Denunciar</button>
+          <div class="email-from">${e.from}</div>
+          <div class="email-subject">${e.subject}</div>
+          <div class="email-snippet">${e.snippet}</div>
+          <div class="email-date">${e.date}</div>
+          ${section !== 'spam' ? `<button class="report-btn" onclick="reportEmail(${i}, '${e.from}', '${e.subject}')">Denunciar</button>` : ''}
         `;
-        row.addEventListener('click', (e) => {
-          if (!e.target.classList.contains('report-btn')) {
-            row.classList.remove('unread');
-          }
-        });
+        row.onclick = () => row.classList.remove('unread');
         list.appendChild(row);
       });
     }
 
-    // ──────────────────────────────────────────────
-    // Función Denunciar
-    // ──────────────────────────────────────────────
-    function reportEmail(from, subject) {
-      if (!currentUser) {
-        alert('Debes iniciar sesión para denunciar.');
-        return;
-      }
-
-      const motivo = prompt('Motivo de la denuncia (opcional):') || 'Sin motivo especificado';
-
+    function reportEmail(index, from, subject) {
+      const motivo = prompt('Motivo (opcional):') || 'Contenido inapropiado';
       const reports = JSON.parse(localStorage.getItem(reportsKey));
-      reports.push({
-        reportedBy: currentUser,
-        reportedEmail: from,
-        subject: subject,
-        motivo: motivo,
-        date: new Date().toLocaleString('es-CO')
-      });
+      reports.push({by:currentUser, email:from, subject, motivo, date:new Date().toLocaleString()});
       localStorage.setItem(reportsKey, JSON.stringify(reports));
 
-      alert('¡Gracias! La denuncia ha sido enviada al administrador.');
-      if (isAdmin) loadAdminPanel(); // refrescar si ya estás en panel
+      // Mover a spam
+      const spam = JSON.parse(localStorage.getItem(spamKey));
+      spam.push({from, subject, snippet:'[Denunciado por usuario]', date:new Date().toLocaleString().split(',')[0], reported:true});
+      localStorage.setItem(spamKey, JSON.stringify(spam));
+
+      alert('Denuncia enviada • Correo movido a Spam');
+      loadEmails();
+      if (isAdmin) showAdminPanel();
     }
 
-    // ──────────────────────────────────────────────
-    // Mostrar Admin Panel
-    // ──────────────────────────────────────────────
-    function showAdminPanel() {
-      if (!isAdmin) return;
+    function openCompose() {
+      document.getElementById('compose-modal').style.display = 'flex';
+    }
+    function closeCompose() {
+      document.getElementById('compose-modal').style.display = 'none';
+    }
+    function formatText(type) {
+      const area = document.getElementById('compose-body');
+      const start = area.selectionStart, end = area.selectionEnd;
+      const text = area.value;
+      let tagOpen = type === 'bold' ? '**' : '*';
+      let tagClose = tagOpen;
+      area.value = text.slice(0, start) + tagOpen + text.slice(start, end) + tagClose + text.slice(end);
+      area.focus();
+    }
+    function sendEmail() {
+      alert('Correo enviado (simulado) → ' + document.getElementById('compose-to').value);
+      closeCompose();
+    }
 
+    function showAdminPanel() {
       document.getElementById('email-content').style.display = 'none';
       document.getElementById('admin-panel').style.display = 'block';
 
       // Usuarios
       const users = JSON.parse(localStorage.getItem(usersKey));
-      const userList = document.getElementById('user-list');
-      userList.innerHTML = '';
-      users.forEach((u, i) => {
-        if (u.username === 'admin') return;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${u.username}</td>
-          <td>${u.password}</td>
-          <td>${u.banned ? 'Baneado' : 'Activo'}</td>
-          <td><button class="ban-btn ${u.banned ? 'banned' : ''}" onclick="toggleBan(${i})">${u.banned ? 'Desbanear' : 'Banear'}</button></td>
-        `;
-        userList.appendChild(tr);
-      });
+      document.getElementById('user-list').innerHTML = users.map((u,i) => u.username==='admin' ? '' : `
+        <tr>
+          <td>${u.username}</td><td>${u.password}</td><td>${u.banned?'Baneado':'Activo'}</td>
+          <td><button class="action-btn" style="background:${u.banned?'#34a853':'#d93025'};color:white;" onclick="toggleBan(${i})">${u.banned?'Desbanear':'Banear'}</button></td>
+        </tr>
+      `).join('');
 
       // Reportes
       const reports = JSON.parse(localStorage.getItem(reportsKey));
-      const reportList = document.getElementById('report-list');
-      reportList.innerHTML = '';
-      reports.forEach(r => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.reportedBy}</td>
-          <td>${r.reportedEmail}</td>
-          <td>${r.motivo}</td>
-          <td>${r.date}</td>
-        `;
-        reportList.appendChild(tr);
-      });
+      document.getElementById('report-list').innerHTML = reports.map(r => `
+        <tr><td>${r.by}</td><td>${r.email}</td><td>${r.motivo}</td><td>${r.date}</td></tr>
+      `).join('');
     }
 
-    function toggleBan(index) {
+    function toggleBan(i) {
       const users = JSON.parse(localStorage.getItem(usersKey));
-      users[index].banned = !users[index].banned;
+      users[i].banned = !users[i].banned;
       localStorage.setItem(usersKey, JSON.stringify(users));
       showAdminPanel();
     }
 
-    // Volver a inbox (puedes mejorar con más secciones después)
-    function showSection(section) {
-      document.getElementById('admin-panel').style.display = 'none';
-      document.getElementById('email-content').style.display = 'flex';
-      // Aquí podrías filtrar correos por sección en el futuro
+    function clearReports() {
+      if (confirm('¿Borrar todas las denuncias?')) {
+        localStorage.setItem(reportsKey, '[]');
+        showAdminPanel();
+      }
     }
 
-    // ──────────────────────────────────────────────
-    // Eventos iniciales
-    // ──────────────────────────────────────────────
-    document.querySelector('.compose-btn').addEventListener('click', () => {
-      alert('Redactar nuevo correo (próximamente modal completa)');
-    });
+    function toggleTheme() {
+      const theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.body.dataset.theme = theme;
+      localStorage.setItem('zenmail-theme', theme);
+    }
+
+    // Init theme
+    if (localStorage.getItem('zenmail-theme') === 'dark' || (!localStorage.getItem('zenmail-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.body.dataset.theme = 'dark';
+    }
+
+    function showSection(sec) {
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('email-content').style.display = 'flex';
+      loadEmails(sec);
+    }
   </script>
 </body>
 </html>
