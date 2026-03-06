@@ -1,219 +1,372 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>NEXUS MARKET ULTRA | v13.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        body { background: #020202; color: white; font-family: 'JetBrains Mono', monospace; }
-        .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0, 255, 170, 0.1); }
-        .input-nexus { background: #0a0a0a; border: 1px solid #222; padding: 12px; border-radius: 12px; color: white; outline: none; width: 100%; }
-        .input-nexus:focus { border-color: #00ffaa; }
-        .badge-verified { background: linear-gradient(45deg, #00ffaa, #00d4ff); color: black; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: 900; text-transform: uppercase; box-shadow: 0 0 10px #00ffaa; }
-        #admin-panel, #login-screen { display: none; }
-        .p-img { width: 100%; height: 180px; object-fit: cover; border-radius: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZenMail - Correo zen y simple</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --sidebar-bg: #f6f8fc;
+      --hover: #e8f0fe;
+      --text: #202124;
+      --text-secondary: #5f6368;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      height: 64px;
+      background: #fff;
+      border-bottom: 1px solid #dadce0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .logo span {
+      font-size: 28px;
+    }
+
+    .search-container {
+      flex: 1;
+      max-width: 720px;
+      background: var(--hover);
+      border-radius: 40px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-container input {
+      border: none;
+      background: transparent;
+      flex: 1;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .header-icons .material-icons {
+      font-size: 24px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .profile {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #8ab4f8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Main layout */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    aside {
+      width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid #dadce0;
+      padding: 12px 8px;
+      overflow-y: auto;
+    }
+
+    .compose-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 500;
+      margin: 12px 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .compose-btn:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      border-radius: 0 24px 24px 0;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+      background: var(--hover);
+      color: var(--primary);
+    }
+
+    .menu-item .material-icons {
+      font-size: 20px;
+    }
+
+    .menu-separator {
+      height: 1px;
+      background: #dadce0;
+      margin: 16px 0;
+    }
+
+    /* Email list */
+    .email-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      height: 48px;
+      border-bottom: 1px solid #dadce0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      background: #fff;
+    }
+
+    .email-list {
+      flex: 1;
+      overflow-y: auto;
+      background: #fff;
+    }
+
+    .email-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+
+    .email-row:hover {
+      background: #f8fcff;
+    }
+
+    .email-row.unread {
+      font-weight: 500;
+      background: #f8fcff;
+    }
+
+    .email-checkbox {
+      margin-right: 16px;
+    }
+
+    .email-star {
+      margin-right: 16px;
+      color: #fbbc05;
+    }
+
+    .email-from {
+      width: 220px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-subject {
+      flex: 1;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-snippet {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-left: 16px;
+      flex: 2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-date {
+      color: var(--text-secondary);
+      font-size: 13px;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      aside { width: 72px; }
+      aside .menu-item span:not(.material-icons) { display: none; }
+      .compose-btn { padding: 12px; width: 56px; justify-content: center; }
+      .search-container { max-width: 400px; }
+    }
+  </style>
 </head>
-<body class="p-4">
+<body>
 
-    <div id="login-screen" class="fixed inset-0 z-[5000] bg-black flex items-center justify-center p-4">
-        <div class="glass max-w-sm w-full p-8 rounded-[40px] text-center">
-            <h2 class="orbitron text-[#00ffaa] mb-6">NEXUS LOGIN</h2>
-            <input type="text" id="u-in" placeholder="USUARIO" class="input-nexus mb-4 text-center">
-            <input type="password" id="p1-in" placeholder="KEY ALFA" class="input-nexus mb-4 text-center">
-            <input type="password" id="p2-in" placeholder="KEY BETA" class="input-nexus mb-6 text-center">
-            <button onclick="login()" class="w-full bg-[#00ffaa] text-black py-4 rounded-xl font-black orbitron">ENTRAR AL SISTEMA</button>
-        </div>
+  <header>
+    <div class="logo">
+      <span class="material-icons">auto_awesome</span>
+      ZenMail
     </div>
 
-    <div id="app" style="display:none">
-        <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 gap-6">
-            <div class="orbitron">
-                <h1 class="text-3xl font-black text-[#00ffaa]">NEXUS <span class="text-white">MARKET</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase">Status: <span id="status-display">Conectado</span></p>
-            </div>
-
-            <div class="relative w-full max-w-md">
-                <input type="text" id="search-bar" oninput="search()" placeholder="Buscar productos o usuarios..." class="input-nexus pl-12">
-                <span class="absolute left-4 top-3.5 opacity-30">🔍</span>
-            </div>
-
-            <div class="flex gap-4">
-                <button id="admin-btn" onclick="toggleAdmin()" class="hidden bg-red-600/20 text-red-500 px-4 py-2 rounded-lg text-xs font-bold border border-red-600/50">ADMIN PANEL</button>
-                <button onclick="logout()" class="bg-white/5 px-4 py-2 rounded-lg text-xs">CERRAR</button>
-            </div>
-        </header>
-
-        <div class="max-w-7xl mx-auto mb-10">
-            <button onclick="openSell()" class="w-full bg-gradient-to-r from-[#00ffaa] to-[#00d4ff] text-black py-4 rounded-2xl font-black orbitron uppercase tracking-widest hover:opacity-90 transition-all">
-                + PUBLICAR NUEVO PRODUCTO
-            </button>
-        </div>
-
-        <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6" id="product-grid"></main>
+    <div class="search-container">
+      <span class="material-icons">search</span>
+      <input type="text" placeholder="Buscar en el correo"/>
     </div>
 
-    <div id="admin-panel" class="fixed inset-0 z-[4000] bg-black/95 p-10 overflow-y-auto">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
-                <h2 class="orbitron text-2xl text-red-500">MASTER ADMIN CONTROL</h2>
-                <button onclick="toggleAdmin()" class="bg-white/10 px-6 py-2 rounded">CERRAR</button>
-            </div>
-            
-            <div class="glass p-8 rounded-3xl">
-                <h3 class="text-xs mb-6 text-gray-400 uppercase">Gestión de Usuarios</h3>
-                <table class="w-full text-left text-xs">
-                    <thead>
-                        <tr class="text-gray-500 border-b border-white/5"><th class="pb-4">USUARIO</th><th class="pb-4">ESTADO</th><th class="pb-4">ACCIÓN</th></tr>
-                    </thead>
-                    <tbody id="user-admin-list"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="header-icons">
+      <span class="material-icons">help_outline</span>
+      <span class="material-icons">settings</span>
+      <span class="material-icons">apps</span>
+      <div class="profile">Z</div>
     </div>
+  </header>
 
-    <div id="modal-sell" class="fixed inset-0 z-[3000] bg-black/90 hidden items-center justify-center p-4">
-        <div class="glass max-w-lg w-full p-8 rounded-[40px]">
-            <h2 class="orbitron text-[#00ffaa] mb-6 uppercase">Publicar Artículo</h2>
-            <div class="space-y-4">
-                <input type="file" id="p-img" accept="image/*" class="text-xs text-gray-500 file:bg-[#00ffaa] file:border-none file:px-4 file:py-1 file:rounded file:mr-4 file:text-black">
-                <input type="text" id="p-name" placeholder="Nombre del producto" class="input-nexus">
-                <input type="number" id="p-price" placeholder="Precio ($)" class="input-nexus">
-                <input type="tel" id="p-wa" placeholder="WhatsApp" class="input-nexus">
-                <button onclick="saveProduct()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron uppercase mt-4">Lanzar al Mercado</button>
-                <button onclick="closeSell()" class="w-full text-xs text-gray-500">Cancelar</button>
-            </div>
+  <div class="main">
+    <aside>
+      <button class="compose-btn">
+        <span class="material-icons">edit</span>
+        <span>Redactar</span>
+      </button>
+
+      <div class="menu-item active">
+        <span class="material-icons">inbox</span>
+        <span>Bandeja de entrada</span>
+      </div>
+      <div class="menu-item">
+        <span class="material-icons">star_border</span>
+        <span>Destacados</span>
+      </div>
+      <div class="menu-item">
+        <span class="material-icons">send</span>
+        <span>Enviados</span>
+      </div>
+      <div class="menu-item">
+        <span class="material-icons">description</span>
+        <span>Borradores</span>
+      </div>
+      <div class="menu-item">
+        <span class="material-icons">delete</span>
+        <span>Papelera</span>
+      </div>
+
+      <div class="menu-separator"></div>
+
+      <div class="menu-item">
+        <span class="material-icons">label_important</span>
+        <span>Importante</span>
+      </div>
+      <div class="menu-item">
+        <span class="material-icons">chat</span>
+        <span>Chats</span>
+      </div>
+    </aside>
+
+    <section class="email-content">
+      <div class="toolbar">
+        <input type="checkbox" class="email-checkbox"/>
+        <span class="material-icons">refresh</span>
+        <span class="material-icons">more_vert</span>
+      </div>
+
+      <div class="email-list">
+        <div class="email-row unread">
+          <input type="checkbox" class="email-checkbox"/>
+          <span class="material-icons email-star">star_border</span>
+          <div class="email-from">Equipo xAI</div>
+          <div class="email-subject">¡Grok 4 ya está en camino! 🚀</div>
+          <div class="email-snippet">Prepárate para el siguiente nivel de inteligencia artificial... solo falta un poco más de entrenamiento.</div>
+          <div class="email-date">14:22</div>
         </div>
-    </div>
 
-    <script>
-        const MASTER = { u: "Maestro_Nexus_2026", k1: "Admin!_@77#_X99_Z026", k2: "Secure-Core#_9910-K_!!" };
-        let users = JSON.parse(localStorage.getItem('nx_users_v13')) || [
-            { name: "Maestro_Nexus_2026", verified: true, admin: true }
-        ];
-        let products = JSON.parse(localStorage.getItem('nx_prods_v13')) || [];
-        let session = localStorage.getItem('nx_session_v13');
+        <div class="email-row">
+          <input type="checkbox" class="email-checkbox"/>
+          <span class="material-icons email-star">star_border</span>
+          <div class="email-from">Netflix</div>
+          <div class="email-subject">Tu serie favorita vuelve en 3 días</div>
+          <div class="email-snippet">Stranger Things temporada final – ya está todo listo para el gran final.</div>
+          <div class="email-date">12 mar</div>
+        </div>
 
-        // --- SISTEMA DE VERIFICADO ÚNICO ---
-        function getSello(username) {
-            // Genera un código hash incopiable basado en el nombre
-            return "V-" + btoa(username).substring(0, 8).toUpperCase();
-        }
+        <div class="email-row unread">
+          <input type="checkbox" class="email-checkbox"/>
+          <span class="material-icons email-star">star</span>
+          <div class="email-from">GitHub</div>
+          <div class="email-subject">¡Felicidades! Tu repositorio zenmail tiene 100 estrellas</div>
+          <div class="email-snippet">Sigue así, la comunidad está muy interesada en tu clon de Gmail jeje</div>
+          <div class="email-date">10 mar</div>
+        </div>
 
-        function login() {
-            const u = document.getElementById('u-in').value;
-            const k1 = document.getElementById('p1-in').value;
-            const k2 = document.getElementById('p2-in').value;
+        <!-- Puedes agregar más filas aquí -->
+      </div>
+    </section>
+  </div>
 
-            if(u === MASTER.u && k1 === MASTER.k1 && k2 === MASTER.k2) {
-                session = u;
-                saveSession();
-            } else if(u && k1 && k2) {
-                if(!users.find(x => x.name === u)) {
-                    users.push({ name: u, verified: false, admin: false });
-                    localStorage.setItem('nx_users_v13', JSON.stringify(users));
-                }
-                session = u;
-                saveSession();
-            }
-        }
+  <script>
+    // Pequeña interacción: marcar como leído al clickear
+    document.querySelectorAll('.email-row').forEach(row => {
+      row.addEventListener('click', () => {
+        row.classList.remove('unread');
+      });
+    });
 
-        function saveSession() {
-            localStorage.setItem('nx_session_v13', session);
-            location.reload();
-        }
-
-        if(session) {
-            document.getElementById('app').style.display = 'block';
-            if(session === MASTER.u) document.getElementById('admin-btn').classList.remove('hidden');
-            render();
-        } else {
-            document.getElementById('login-screen').style.display = 'flex';
-        }
-
-        function render(data = products) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = data.map((p, i) => {
-                const userObj = users.find(u => u.name === p.seller);
-                const isVerified = userObj && userObj.verified;
-                return `
-                    <div class="glass p-5 rounded-[30px] border border-white/5 hover:border-[#00ffaa]/50 transition-all">
-                        <img src="${p.img}" class="p-img mb-4">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] text-gray-500 font-bold">@${p.seller}</span>
-                            ${isVerified ? `<span class="badge-verified" title="ID: ${getSello(p.seller)}">✓ VERIFICADO</span>` : ''}
-                        </div>
-                        <h3 class="orbitron text-sm font-bold truncate">${p.name}</h3>
-                        <p class="text-[#00ffaa] font-black text-xl mb-4">$${p.price}</p>
-                        <a href="https://wa.me/${p.wa}" target="_blank" class="block w-full bg-white/5 text-center py-2 rounded-lg text-[10px] font-black hover:bg-[#00ffaa] hover:text-black transition-all uppercase">Contactar Vendedor</a>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function search() {
-            const val = document.getElementById('search-bar').value.toLowerCase();
-            const filtered = products.filter(p => 
-                p.name.toLowerCase().includes(val) || 
-                p.seller.toLowerCase().includes(val)
-            );
-            render(filtered);
-        }
-
-        // --- ADMIN PANEL ---
-        function toggleAdmin() {
-            const p = document.getElementById('admin-panel');
-            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-            if(p.style.display === 'block') renderAdminUsers();
-        }
-
-        function renderAdminUsers() {
-            const list = document.getElementById('user-admin-list');
-            list.innerHTML = users.map(u => `
-                <tr class="border-b border-white/5">
-                    <td class="py-4 font-bold ${u.admin ? 'text-red-500' : ''}">${u.name}</td>
-                    <td class="py-4 text-[10px]">${u.verified ? '<span class="text-[#00ffaa]">✓ VERIFICADO</span>' : '<span class="text-gray-600">PENDIENTE</span>'}</td>
-                    <td class="py-4">
-                        <button onclick="toggleVerify('${u.name}')" class="bg-white/10 px-3 py-1 rounded text-[9px] uppercase">
-                            ${u.verified ? 'Quitar Verificado' : 'Dar Verificado'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function toggleVerify(name) {
-            users = users.map(u => u.name === name ? {...u, verified: !u.verified} : u);
-            localStorage.setItem('nx_users_v13', JSON.stringify(users));
-            renderAdminUsers();
-            render();
-        }
-
-        // --- VENTAS ---
-        function openSell() { document.getElementById('modal-sell').style.display = 'flex'; }
-        function closeSell() { document.getElementById('modal-sell').style.display = 'none'; }
-
-        function saveProduct() {
-            const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const wa = document.getElementById('p-wa').value;
-            const file = document.getElementById('p-img').files[0];
-
-            if(!name || !price || !file) return alert("Faltan datos");
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                products.unshift({ name, price, wa, img: e.target.result, seller: session });
-                localStorage.setItem('nx_prods_v13', JSON.stringify(products));
-                render();
-                closeSell();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function logout() { localStorage.removeItem('nx_session_v13'); location.reload(); }
-    </script>
+    // Botón redactar (solo alerta por ahora)
+    document.querySelector('.compose-btn').addEventListener('click', () => {
+      alert('¡Redactando nuevo correo en ZenMail! (próximamente ventana modal ✨)');
+    });
+  </script>
 </body>
 </html>
