@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS UNIVERSE | Central Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        :root {
+            --nexus-green: #00ffaa;
+            --nexus-blue: #00d4ff;
+            --nexus-void: #050505;
+        }
+
+        body {
+            background-color: var(--nexus-void);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+        }
+
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 170, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px var(--nexus-green);
+        }
+
+        /* Verificados Blindados Nexus */
+        .nexus-badge {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, var(--nexus-green), var(--nexus-blue));
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            margin-left: 8px;
+            animation: rotate-badge 3s linear infinite;
+        }
+
+        @keyframes rotate-badge {
+            from { filter: hue-rotate(0deg); }
+            to { filter: hue-rotate(360deg); }
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .scanner-line {
+            width: 100%;
+            height: 2px;
+            background: var(--nexus-green);
+            position: absolute;
+            box-shadow: 0 0 15px var(--nexus-green);
+            animation: scan 4s ease-in-out infinite;
+            z-index: 10;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .btn-nexus {
+            background: linear-gradient(90deg, #00ffaa33, #00d4ff33);
+            border: 1px solid var(--nexus-green);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .btn-nexus:hover {
+            background: var(--nexus-green);
+            color: black;
+            box-shadow: 0 0 30px var(--nexus-green);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanner-line"></div>
+    <div id="canvas-container"></div>
+
+    <div class="relative z-20 h-screen flex flex-col p-8">
+        
+        <nav class="flex justify-between items-start mb-10">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl flex items-center justify-center text-4xl shadow-[0_0_20px_rgba(0,255,170,0.5)]">
+                    <span class="orbitron font-black text-black">N</span>
+                </div>
+                <div>
+                    <h1 class="orbitron text-4xl font-black tracking-tighter glow-text">NEXUS UNIVERSE</h1>
+                    <p class="text-xs tracking-[0.6em] text-cyan-400 uppercase font-light">Versión 2.0.6 | Motor Zen-Voxel</p>
+                </div>
+            </div>
+
+            <div class="glass p-4 rounded-3xl flex items-center gap-6">
+                <div class="text-right">
+                    <div class="flex items-center justify-end">
+                        <span class="font-bold text-white text-lg">PRO-BUILDER_01</span>
+                        <div class="nexus-badge"></div>
+                    </div>
+                    <span class="text-cyan-400 text-xs font-mono">152,430 ZEN-COINS</span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=PB&background=00ffaa&color=000" class="w-12 h-12 rounded-full border-2 border-cyan-400">
+            </div>
+        </nav>
+
+        <div class="flex-1 flex gap-8 overflow-hidden">
+            
+            <aside class="w-80 flex flex-col gap-4">
+                <div class="glass rounded-[30px] p-6 flex-1 overflow-y-auto">
+                    <h2 class="orbitron text-sm mb-6 text-gray-400">DISTRITOS ACTIVOS</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 hover:border-nexus-green transition-all">
+                            <img src="https://picsum.photos/300/150?random=1" class="w-full opacity-40 group-hover:scale-110 transition-transform">
+                            <div class="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
+                                <h3 class="font-bold">CYBER-STRIKE 2026</h3>
+                                <p class="text-[10px] text-cyan-400">42.5K JUGANDO</p>
+                            </div>
+                        </div>
+
+                        <div class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 hover:border-nexus-green transition-all">
+                            <img src="https://picsum.photos/300/150?random=2" class="w-full opacity-40 group-hover:scale-110 transition-transform">
+                            <div class="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
+                                <h3 class="font-bold">VOID RUNNER</h3>
+                                <p class="text-[10px] text-cyan-400">12.1K JUGANDO</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-nexus p-6 rounded-3xl">CREAR NUEVO MUNDO</button>
+            </aside>
+
+            <main class="flex-1 flex flex-col gap-6">
+                <div class="glass flex-1 rounded-[40px] p-10 flex flex-col justify-end relative overflow-hidden">
+                    <div class="absolute top-10 left-10">
+                        <span class="bg-cyan-500/10 text-cyan-400 px-4 py-1 rounded-full text-xs border border-cyan-500/20 font-bold">MODO: PERSPECTIVA DE NÚCLEO</span>
+                    </div>
+
+                    <div class="max-w-2xl">
+                        <h2 class="orbitron text-5xl font-black mb-4 leading-tight italic">TU IMAGINACIÓN ES EL <span class="text-emerald-400">LÍMITE</span></h2>
+                        <p class="text-gray-400 mb-8 text-lg">Habla con el Arquitecto Nexus para generar mundos físicos, mecánicas complejas o avatares únicos instantáneamente.</p>
+                        
+                        <div class="flex gap-4">
+                            <input type="text" placeholder="Escribe aquí tu creación: 'Un planeta de cristal con gravedad cero...'" 
+                                   class="flex-1 bg-white/5 border border-white/10 p-6 rounded-3xl outline-none focus:border-nexus-green transition-all text-white">
+                            <button class="bg-nexus-green text-black px-10 rounded-3xl font-black orbitron text-sm">GENERAR</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-32 flex gap-6">
+                    <div class="glass flex-1 rounded-3xl p-4 flex items-center justify-around">
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-bold">FPS</p>
+                            <p class="orbitron text-xl text-nexus-green">144</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-bold">LATENCIA</p>
+                            <p class="orbitron text-xl text-nexus-blue">2ms</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-bold">RENDER</p>
+                            <p class="orbitron text-xl">VOXEL-MAX</p>
+                        </div>
+                    </div>
+                    <div class="glass w-96 rounded-3xl p-4 flex items-center justify-between px-8">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400">RECOMPENSAS DIARIAS</p>
+                            <p class="text-nexus-green font-bold">200 ZEN-C RECOLECTADOS</p>
+                        </div>
+                        <div class="text-3xl">💎</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- NEXUS 3D BACKGROUND ENGINE ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Crear una malla de cubos (Voxels)
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const particlesCount = 300;
+        const voxels = [];
+
+        for (let i = 0; i < particlesCount; i++) {
+            const material = new THREE.MeshBasicMaterial({ 
+                color: i % 2 === 0 ? 0x00ffaa : 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            });
+            const cube = new THREE.Mesh(geometry, material);
+            
+            cube.position.x = (Math.random() - 0.5) * 50;
+            cube.position.y = (Math.random() - 0.5) * 50;
+            cube.position.z = (Math.random() - 0.5) * 50;
+            
+            cube.rotation.x = Math.random() * Math.PI;
+            cube.rotation.y = Math.random() * Math.PI;
+            
+            scene.add(cube);
+            voxels.push(cube);
+        }
+
+        camera.position.z = 25;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            voxels.forEach((cube, i) => {
+                cube.rotation.x += 0.001;
+                cube.rotation.y += 0.002;
+                cube.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+            });
+
+            scene.rotation.y += 0.0005;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
