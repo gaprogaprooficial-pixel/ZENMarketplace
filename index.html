@@ -2,174 +2,195 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS STUDIO & ENGINE | v9.0</title>
+    <title>NEXUS ENGINE v10.0 | FULL STUDIO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        body { background: #050505; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        body { background: #000; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; margin: 0; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,170,0.1); }
-        .grid-bg { background-size: 40px 40px; background-image: linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px); }
         
-        /* Render de Bloques */
-        .block { width: 40px; height: 40px; position: absolute; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
-        .b-wall { background: #555; box-shadow: inset 0 0 10px #000; }
-        .b-water { background: #0066ff; opacity: 0.7; }
-        .b-lava { background: #ff4400; box-shadow: 0 0 15px #ff4400; }
-        .b-grass { background: #228822; }
+        /* Escenario */
+        #game-container { width: 100vw; height: 100vh; position: relative; background: #111; overflow: hidden; }
+        .grid-layer { position: absolute; inset: 0; background-size: 50px 50px; background-image: linear-gradient(to right, #222 1px, transparent 1px), linear-gradient(to bottom, #222 1px, transparent 1px); }
+        
+        /* Entidades */
+        .entity { width: 50px; height: 50px; position: absolute; transition: all 0.1s linear; box-sizing: border-box; }
+        .player { background: #00ffaa; border-radius: 10px; z-index: 100; border: 3px solid #fff; box-shadow: 0 0 20px #00ffaa; }
+        .player-head { width: 20px; height: 20px; background: #fff; margin: 5px auto; border-radius: 5px; }
+        
+        /* Tipos de Bloques */
+        .b-wall { background: #444; border: 4px solid #333; z-index: 10; } /* Sólido */
+        .b-lava { background: #ff4400; box-shadow: inset 0 0 15px #000; z-index: 5; } /* Script: Daño */
+        .b-coin { background: #facc15; border-radius: 50%; transform: scale(0.5); z-index: 5; } /* Script: Dinero */
+        .b-portal { background: #9333ea; animation: pulse 1s infinite; z-index: 5; }
 
-        #app-shell, #modal-studio, #modal-player { display: none; }
-        .admin-glow { box-shadow: 0 0 15px rgba(255,0,0,0.3); border: 1px solid red; }
+        /* Chat en Juego */
+        .bubble { position: absolute; background: white; color: black; padding: 5px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; width: max-content; bottom: 60px; left: 50%; transform: translateX(-50%); pointer-events: none; }
+
+        #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+        .interactive { pointer-events: auto; }
+        #studio-panel { display: none; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
-<div id="login-gate" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
-    <div class="max-w-md w-full glass p-10 rounded-[40px] border-b-4 border-[#00ffaa]">
-        <h1 class="orbitron text-center text-3xl font-black mb-8 text-[#00ffaa]">NEXUS ENGINE</h1>
-        <input type="text" id="log-user" placeholder="USUARIO" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
-        <input type="password" id="key-alpha" placeholder="KEY ALFA" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
-        <input type="password" id="key-beta" placeholder="KEY BETA" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
-        <button onclick="intentarEntrar()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron">INICIAR SESIÓN</button>
+<div id="game-container">
+    <div class="grid-layer"></div>
+    <div id="world"></div>
+    <div id="player" class="entity player">
+        <div class="player-head"></div>
+        <div id="player-bubble" class="bubble" style="display:none"></div>
     </div>
 </div>
 
-<div id="app-shell" class="h-screen flex flex-col">
-    <header class="p-4 glass flex justify-between items-center z-50">
-        <div class="flex items-center gap-4">
-            <span id="u-name" class="orbitron font-black text-[#00ffaa]"></span>
-            <div class="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-bold">🪙 <span id="u-coins">0</span></div>
+<div id="ui-layer">
+    <div class="p-6 flex justify-between items-end h-full">
+        <div class="space-y-4 interactive">
+            <div class="glass p-4 rounded-2xl border border-white/10 bg-black/50">
+                <p class="orbitron text-[#00ffaa] text-sm">NEXUS OS v10.0</p>
+                <p class="text-[10px] text-yellow-500 font-bold">COINS: <span id="coin-count">500</span></p>
+            </div>
+            <div class="w-80 h-40 glass rounded-xl bg-black/60 p-2 overflow-y-auto text-[10px]" id="chat-logs"></div>
+            <input type="text" id="chat-input" placeholder="Presiona Enter para hablar..." class="w-80 bg-black/80 border border-[#00ffaa] p-2 rounded text-xs outline-none">
         </div>
-        <div class="flex gap-4">
-            <button onclick="openStudio()" class="bg-purple-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron">NEXUS STUDIO</button>
-            <button onclick="openGames()" class="bg-blue-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron">EXPLORAR JUEGOS</button>
-            <button id="admin-trigger" class="hidden bg-red-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron" onclick="alert('Abriendo Panel Admin...')">ADMIN</button>
-        </div>
-    </header>
 
-    <main class="flex-1 flex items-center justify-center">
-        <div class="text-center">
-            <h2 class="orbitron text-6xl font-black opacity-10">THE MULTIVERSE</h2>
-            <p class="text-gray-600 mt-4">Selecciona Studio para crear o Explorar para jugar.</p>
-        </div>
-    </main>
-</div>
-
-<div id="modal-studio" class="fixed inset-0 z-[600] bg-[#111] flex flex-col">
-    <div class="p-4 glass flex justify-between items-center">
-        <h2 class="orbitron text-purple-500 font-black">NEXUS STUDIO v1.0</h2>
-        <div class="flex gap-2">
-            <select id="tool-type" class="bg-black text-white p-2 rounded border border-purple-500 text-xs">
-                <option value="b-grass">BLOQUE: PASTO</option>
-                <option value="b-wall">BLOQUE: MURO</option>
-                <option value="b-water">BLOQUE: AGUA</option>
-                <option value="b-lava">BLOQUE: LAVA</option>
-            </select>
-            <button onclick="saveMyGame()" class="bg-green-600 px-4 py-2 rounded text-xs font-bold">PUBLICAR JUEGO</button>
-            <button onclick="closeStudio()" class="bg-red-600 px-4 py-2 rounded text-xs font-bold">SALIR</button>
+        <div class="flex flex-col gap-2 interactive">
+            <button onclick="toggleStudio()" class="bg-purple-600 px-6 py-3 rounded-xl font-black orbitron text-xs">ABRIR STUDIO</button>
+            <button id="admin-btn" class="hidden bg-red-600 px-6 py-3 rounded-xl font-black orbitron text-xs">ADMIN PANEL</button>
         </div>
     </div>
-    <div id="editor-viewport" class="flex-1 relative grid-bg overflow-hidden cursor-crosshair" onclick="placeBlock(event)">
-        </div>
-    <div class="p-2 bg-black text-[10px] text-gray-500">Haz clic en la cuadrícula para colocar bloques. Costo: 5 Coins por bloque.</div>
 </div>
 
-<div id="modal-player" class="fixed inset-0 z-[700] bg-black/95 p-10 overflow-y-auto">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="orbitron text-4xl font-black text-blue-500">JUEGOS DE LA COMUNIDAD</h2>
-            <button onclick="closeGames()" class="bg-white/10 px-6 py-2 rounded">VOLVER</button>
-        </div>
-        <div id="games-grid" class="grid grid-cols-3 gap-6"></div>
+<div id="studio-panel" class="fixed top-0 right-0 w-64 h-full bg-[#111] border-l border-purple-500 p-6 flex flex-col gap-4 z-[2000]">
+    <h2 class="orbitron text-purple-500 font-black">STUDIO TOOL</h2>
+    <hr class="border-white/10">
+    <label class="text-[10px]">TIPO DE BLOQUE</label>
+    <select id="block-type" class="bg-black border border-white/20 p-2 rounded text-xs">
+        <option value="b-wall">MURO (SÓLIDO)</option>
+        <option value="b-lava">LAVA (SCRIPT: KILL)</option>
+        <option value="b-coin">COIN (SCRIPT: GIVE)</option>
+        <option value="b-portal">PORTAL (SCRIPT: WIN)</option>
+    </select>
+    <div class="mt-auto space-y-2">
+        <button onclick="saveWorld()" class="w-full bg-green-600 py-2 rounded font-bold text-xs">GUARDAR MAPA</button>
+        <button onclick="toggleStudio()" class="w-full bg-white/10 py-2 rounded font-bold text-xs">CERRAR STUDIO</button>
     </div>
 </div>
 
 <script>
-let users = JSON.parse(localStorage.getItem('nx_clean_u')) || [];
-let worldData = JSON.parse(localStorage.getItem('nx_worlds')) || [];
-let current = null;
-let myBlocks = [];
+// --- CONFIGURACIÓN INICIAL ---
+let px = 100, py = 100;
+let blocks = JSON.parse(localStorage.getItem('nx_world_blocks')) || [];
+let studioMode = false;
+let coins = 500;
 
-function intentarEntrar() {
-    const u = document.getElementById('log-user').value;
-    const k1 = document.getElementById('key-alpha').value;
-    const k2 = document.getElementById('key-beta').value;
-    const found = users.find(x => x.name === u && x.k1 === k1 && x.k2 === k2);
+const player = document.getElementById('player');
+const world = document.getElementById('world');
 
-    if(found) {
-        current = found;
-        if(!current.coins) current.coins = 500; // Monedas iniciales
-        document.getElementById('login-gate').style.display = 'none';
-        document.getElementById('app-shell').style.display = 'flex';
-        document.getElementById('u-name').innerText = current.name;
-        document.getElementById('u-coins').innerText = current.coins;
-        if(current.isAdmin) document.getElementById('admin-trigger').style.display = 'block';
-    } else { alert("ERROR"); }
-}
-
-// --- LOGICA DE STUDIO ---
-function openStudio() { 
-    document.getElementById('modal-studio').style.display = 'flex'; 
-    myBlocks = [];
-    document.getElementById('editor-viewport').innerHTML = '';
-}
-
-function placeBlock(e) {
-    if(current.coins < 5) return alert("SIN MONEDAS");
+// --- MOTOR DE MOVIMIENTO Y COLISIÓN ---
+document.addEventListener('keydown', (e) => {
+    if(document.activeElement.tagName === 'INPUT') return;
     
-    const x = Math.floor(e.clientX / 40) * 40;
-    const y = Math.floor((e.clientY - 60) / 40) * 40;
-    const type = document.getElementById('tool-type').value;
+    let nextX = px, nextY = py;
+    const speed = 50;
 
-    const block = document.createElement('div');
-    block.className = `block ${type}`;
-    block.style.left = x + 'px';
-    block.style.top = y + 'px';
-    document.getElementById('editor-viewport').appendChild(block);
+    if(e.key === 'ArrowUp') nextY -= speed;
+    if(e.key === 'ArrowDown') nextY += speed;
+    if(e.key === 'ArrowLeft') nextX -= speed;
+    if(e.key === 'ArrowRight') nextX += speed;
 
-    myBlocks.push({ x, y, type });
-    current.coins -= 5;
-    document.getElementById('u-coins').innerText = current.coins;
+    if(!checkCollision(nextX, nextY)) {
+        px = nextX; py = nextY;
+        updatePlayer();
+        checkScripts(px, py);
+    }
+});
+
+function checkCollision(nx, ny) {
+    // Colisión con muros (bloques tipo b-wall)
+    return blocks.some(b => b.x === nx && b.y === ny && b.type === 'b-wall');
 }
 
-function saveMyGame() {
-    const name = prompt("NOMBRE DEL JUEGO:");
-    if(!name) return;
-    
-    worldData.push({
-        id: Date.now(),
-        name: name,
-        creator: current.name,
-        data: myBlocks
+function checkScripts(nx, ny) {
+    blocks.forEach((b, index) => {
+        if(b.x === nx && b.y === ny) {
+            if(b.type === 'b-lava') {
+                alert("TE QUEMASTE EN LA LAVA");
+                px = 100; py = 100; updatePlayer();
+            }
+            if(b.type === 'b-coin') {
+                coins += 50;
+                document.getElementById('coin-count').innerText = coins;
+                blocks.splice(index, 1); // Desaparece al recoger
+                renderWorld();
+            }
+        }
     });
-    localStorage.setItem('nx_worlds', JSON.stringify(worldData));
-    alert("JUEGO PUBLICADO EN EL MULTIVERSO");
-    closeStudio();
 }
 
-// --- LOGICA DE EXPLORADOR ---
-function openGames() {
-    document.getElementById('modal-player').style.display = 'block';
-    const grid = document.getElementById('games-grid');
-    grid.innerHTML = worldData.map(w => `
-        <div class="glass p-6 rounded-3xl border border-blue-500/20 hover:border-blue-500 transition-all">
-            <h3 class="orbitron text-xl mb-2">${w.name}</h3>
-            <p class="text-[10px] text-gray-500 mb-4">CREADO POR: ${w.creator}</p>
-            <button onclick="playGame(${w.id})" class="w-full bg-blue-600 py-3 rounded-xl font-black text-xs">JUGAR</button>
-        </div>
+function updatePlayer() {
+    player.style.left = px + 'px';
+    player.style.top = py + 'px';
+}
+
+// --- SISTEMA DE STUDIO ---
+document.getElementById('game-container').onclick = function(e) {
+    if(!studioMode) return;
+    const x = Math.floor(e.clientX / 50) * 50;
+    const y = Math.floor(e.clientY / 50) * 50;
+    const type = document.getElementById('block-type').value;
+
+    // Quitar bloque si ya existe en esa posición
+    const existing = blocks.findIndex(b => b.x === x && b.y === y);
+    if(existing !== -1) blocks.splice(existing, 1);
+
+    blocks.push({ x, y, type });
+    renderWorld();
+};
+
+function renderWorld() {
+    world.innerHTML = blocks.map(b => `
+        <div class="entity ${b.type}" style="left:${b.x}px; top:${b.y}px"></div>
     `).join('');
 }
 
-function playGame(id) {
-    const world = worldData.find(w => w.id === id);
-    // Simulación de carga de motor
-    alert(`Entrando a ${world.name}...\nCargando ${world.data.length} bloques...`);
-    // Aquí se renderizarían los bloques en un visor 3D o 2D
+function toggleStudio() {
+    studioMode = !studioMode;
+    document.getElementById('studio-panel').style.display = studioMode ? 'flex' : 'none';
+    alert(studioMode ? "MODO STUDIO: Haz clic en el suelo para poner bloques." : "MODO JUEGO: Usa las flechas para moverte.");
 }
 
-function closeStudio() { document.getElementById('modal-studio').style.display = 'none'; }
-function closeGames() { document.getElementById('modal-player').style.display = 'none'; }
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+// --- SISTEMA DE CHAT ---
+const chatInput = document.getElementById('chat-input');
+const bubble = document.getElementById('player-bubble');
+
+chatInput.onkeypress = function(e) {
+    if(e.key === 'Enter' && this.value.trim() !== "") {
+        const msg = this.value;
+        // Mostrar burbuja sobre el jugador
+        bubble.innerText = msg;
+        bubble.style.display = 'block';
+        
+        // Log en la caja de chat
+        const log = document.createElement('div');
+        log.innerHTML = `<b class="text-[#00ffaa]">TÚ:</b> ${msg}`;
+        document.getElementById('chat-logs').appendChild(log);
+        document.getElementById('chat-logs').scrollTop = 9999;
+
+        setTimeout(() => bubble.style.display = 'none', 3000);
+        this.value = "";
+    }
+};
+
+function saveWorld() {
+    localStorage.setItem('nx_world_blocks', JSON.stringify(blocks));
+    alert("MAPA GUARDADO EN LA NUBE.");
+}
+
+// Inicializar
+renderWorld();
+updatePlayer();
 </script>
 </body>
 </html>
