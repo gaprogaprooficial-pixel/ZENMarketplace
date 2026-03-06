@@ -7,351 +7,136 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <style>
-    /* Estilos anteriores (copia todo el <style> del mensaje previo aquí) */
     :root {
       --primary: #0066ff;
       --sidebar-bg: #f6f8fc;
       --hover: #e8f0fe;
       --text: #202124;
       --text-secondary: #5f6368;
+      --danger: #d93025;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Roboto', sans-serif;
-      background: #fff;
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      background:#fff; color:var(--text);
+      height:100vh; overflow:hidden;
+      display:flex; flex-direction:column;
     }
 
-    /* Header */
     header {
-      height: 64px;
-      background: #fff;
-      border-bottom: 1px solid #dadce0;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 24px;
+      height:64px; background:#fff; border-bottom:1px solid #dadce0;
+      display:flex; align-items:center; padding:0 16px; gap:24px;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--primary);
-    }
-
-    .logo span {
-      font-size: 28px;
-    }
+    .logo { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:500; color:var(--primary); }
+    .logo span { font-size:28px; }
 
     .search-container {
-      flex: 1;
-      max-width: 720px;
-      background: var(--hover);
-      border-radius: 40px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      flex:1; max-width:720px; background:var(--hover); border-radius:40px;
+      padding:8px 16px; display:flex; align-items:center; gap:12px;
     }
+    .search-container input { border:none; background:transparent; flex:1; font-size:16px; outline:none; }
 
-    .search-container input {
-      border: none;
-      background: transparent;
-      flex: 1;
-      font-size: 16px;
-      outline: none;
-    }
+    .header-icons { display:flex; gap:16px; align-items:center; }
+    .header-icons .material-icons { font-size:24px; color:var(--text-secondary); cursor:pointer; }
+    .profile { width:32px; height:32px; border-radius:50%; background:#8ab4f8; color:white; display:flex; align-items:center; justify-content:center; font-weight:500; cursor:pointer; }
 
-    .header-icons {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
+    .main { flex:1; display:flex; overflow:hidden; }
 
-    .header-icons .material-icons {
-      font-size: 24px;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .profile {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #8ab4f8;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    /* Main layout */
-    .main {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* Sidebar */
     aside {
-      width: 280px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid #dadce0;
-      padding: 12px 8px;
-      overflow-y: auto;
+      width:280px; background:var(--sidebar-bg); border-right:1px solid #dadce0;
+      padding:12px 8px; overflow-y:auto;
     }
 
     .compose-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 24px;
-      padding: 12px 28px;
-      font-size: 15px;
-      font-weight: 500;
-      margin: 12px 16px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      background:var(--primary); color:white; border:none; border-radius:24px;
+      padding:12px 28px; font-size:15px; font-weight:500; margin:12px 16px 24px;
+      display:flex; align-items:center; gap:12px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.2);
     }
-
-    .compose-btn:hover {
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
+    .compose-btn:hover { box-shadow:0 4px 10px rgba(0,0,0,0.15); }
 
     .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      padding: 12px 24px;
-      font-size: 14px;
-      color: var(--text-secondary);
-      border-radius: 0 24px 24px 0;
-      cursor: pointer;
-      margin-right: 8px;
+      display:flex; align-items:center; gap:20px; padding:12px 24px; font-size:14px;
+      color:var(--text-secondary); border-radius:0 24px 24px 0; cursor:pointer; margin-right:8px;
     }
+    .menu-item:hover, .menu-item.active { background:var(--hover); color:var(--primary); }
+    .menu-item .material-icons { font-size:20px; }
 
-    .menu-item:hover,
-    .menu-item.active {
-      background: var(--hover);
-      color: var(--primary);
-    }
+    .menu-separator { height:1px; background:#dadce0; margin:16px 0; }
 
-    .menu-item .material-icons {
-      font-size: 20px;
-    }
-
-    .menu-separator {
-      height: 1px;
-      background: #dadce0;
-      margin: 16px 0;
-    }
-
-    /* Email list */
-    .email-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    .email-content { flex:1; display:flex; flex-direction:column; }
 
     .toolbar {
-      height: 48px;
-      border-bottom: 1px solid #dadce0;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 16px;
-      background: #fff;
+      height:48px; border-bottom:1px solid #dadce0; display:flex; align-items:center;
+      padding:0 16px; gap:16px; background:#fff;
     }
 
-    .email-list {
-      flex: 1;
-      overflow-y: auto;
-      background: #fff;
-    }
+    .email-list { flex:1; overflow-y:auto; background:#fff; }
 
     .email-row {
-      display: flex;
-      align-items: center;
-      padding: 8px 24px;
-      border-bottom: 1px solid #f0f0f0;
-      cursor: pointer;
+      display:flex; align-items:center; padding:8px 24px; border-bottom:1px solid #f0f0f0;
+      cursor:pointer; position:relative;
     }
+    .email-row:hover { background:#f8fcff; }
+    .email-row.unread { font-weight:500; background:#f8fcff; }
 
-    .email-row:hover {
-      background: #f8fcff;
+    .email-checkbox { margin-right:16px; }
+    .email-star { margin-right:16px; color:#fbbc05; }
+    .email-from { width:220px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .email-subject { flex:1; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .email-snippet { color:var(--text-secondary); font-size:13px; margin-left:16px; flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .email-date { color:var(--text-secondary); font-size:13px; min-width:80px; text-align:right; }
+
+    .report-btn {
+      background:var(--danger); color:white; border:none; border-radius:4px;
+      padding:4px 10px; font-size:12px; cursor:pointer; margin-left:12px;
+      opacity:0; transition:opacity 0.2s;
     }
+    .email-row:hover .report-btn { opacity:1; }
 
-    .email-row.unread {
-      font-weight: 500;
-      background: #f8fcff;
-    }
-
-    .email-checkbox {
-      margin-right: 16px;
-    }
-
-    .email-star {
-      margin-right: 16px;
-      color: #fbbc05;
-    }
-
-    .email-from {
-      width: 220px;
-      font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .email-subject {
-      flex: 1;
-      font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .email-snippet {
-      color: var(--text-secondary);
-      font-size: 13px;
-      margin-left: 16px;
-      flex: 2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .email-date {
-      color: var(--text-secondary);
-      font-size: 13px;
-      min-width: 80px;
-      text-align: right;
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      aside { width: 72px; }
-      aside .menu-item span:not(.material-icons) { display: none; }
-      .compose-btn { padding: 12px; width: 56px; justify-content: center; }
-      .search-container { max-width: 400px; }
-    }
-
-    /* Nuevos estilos para login y admin panel */
+    /* Login & Admin */
     #login-page {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(255,255,255,0.95); display:flex; align-items:center; justify-content:center; z-index:1000;
     }
+    .login-form { background:white; padding:32px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.1); width:320px; }
+    .login-form input { width:100%; padding:12px; margin:8px 0; border:1px solid #dadce0; border-radius:4px; }
+    .login-form button { width:100%; background:var(--primary); color:white; border:none; padding:12px; border-radius:4px; cursor:pointer; }
 
-    .login-form {
-      background: white;
-      padding: 32px;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      width: 320px;
+    #admin-panel { display:none; flex:1; padding:24px; background:#fff; overflow-y:auto; }
+    .user-table, .report-table { width:100%; border-collapse:collapse; margin-top:20px; }
+    .user-table th, .user-table td, .report-table th, .report-table td {
+      padding:12px; border-bottom:1px solid #dadce0; text-align:left;
     }
-
-    .login-form input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-    }
-
-    .login-form button {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    #admin-panel {
-      display: none;
-      flex: 1;
-      padding: 24px;
-      background: #fff;
-      overflow-y: auto;
-    }
-
-    .user-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .user-table th, .user-table td {
-      padding: 12px;
-      border-bottom: 1px solid #dadce0;
-      text-align: left;
-    }
-
     .ban-btn {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      padding:6px 12px; border:none; border-radius:4px; cursor:pointer;
     }
+    .ban-btn.banned { background:#d93025; color:white; }
+    .ban-btn:not(.banned) { background:#1a73e8; color:white; }
 
-    .ban-btn.banned {
-      background: #d93025;
-      color: white;
-    }
+    .verified-badge { display:inline-block; margin-left:8px; vertical-align:middle; }
 
-    .ban-btn:not(.banned) {
-      background: #1a73e8;
-      color: white;
-    }
+    .main, header { display:none; }
 
-    .verified-badge {
-      display: inline-block;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-
-    /* Ocultar main hasta login */
-    .main, header {
-      display: none;
+    @media (max-width:900px) {
+      aside { width:72px; }
+      aside .menu-item span:not(.material-icons) { display:none; }
+      .compose-btn { padding:12px; width:56px; justify-content:center; }
+      .search-container { max-width:400px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Página de login -->
+  <!-- Login -->
   <div id="login-page">
     <div class="login-form">
       <h2>Inicia sesión en ZenMail</h2>
       <input type="text" id="username" placeholder="Usuario (admin para panel)" />
       <input type="password" id="password" placeholder="Contraseña" />
       <button onclick="login()">Entrar</button>
-      <p>Admin demo: usuario 'admin', contraseña 'X7pQ#9LmT$4vK2eR!8wZ'</p>
+      <p style="margin-top:12px; font-size:13px;">Admin: <b>admin</b> / <b>X7pQ#9LmT$4vK2eR!8wZ</b></p>
     </div>
   </div>
 
@@ -360,12 +145,10 @@
       <span class="material-icons">auto_awesome</span>
       ZenMail
     </div>
-
     <div class="search-container">
       <span class="material-icons">search</span>
       <input type="text" placeholder="Buscar en el correo"/>
     </div>
-
     <div class="header-icons">
       <span class="material-icons">help_outline</span>
       <span class="material-icons">settings</span>
@@ -381,30 +164,22 @@
         <span>Redactar</span>
       </button>
 
-      <div class="menu-item active">
+      <div class="menu-item active" onclick="showSection('inbox')">
         <span class="material-icons">inbox</span>
         <span>Bandeja de entrada</span>
       </div>
-      <div class="menu-item">
+      <div class="menu-item" onclick="showSection('inbox')">
         <span class="material-icons">star_border</span>
         <span>Destacados</span>
       </div>
-      <div class="menu-item">
+      <div class="menu-item" onclick="showSection('inbox')">
         <span class="material-icons">send</span>
         <span>Enviados</span>
-      </div>
-      <div class="menu-item">
-        <span class="material-icons">description</span>
-        <span>Borradores</span>
-      </div>
-      <div class="menu-item">
-        <span class="material-icons">delete</span>
-        <span>Papelera</span>
       </div>
 
       <div class="menu-separator"></div>
 
-      <div class="menu-item" onclick="showAdminPanel()">
+      <div class="menu-item" id="admin-menu" style="display:none;" onclick="showAdminPanel()">
         <span class="material-icons">admin_panel_settings</span>
         <span>Admin Panel</span>
       </div>
@@ -417,125 +192,205 @@
         <span class="material-icons">more_vert</span>
       </div>
 
-      <div class="email-list">
-        <div class="email-row unread">
-          <input type="checkbox" class="email-checkbox"/>
-          <span class="material-icons email-star">star_border</span>
-          <div class="email-from">Equipo xAI<svg class="verified-badge" width="16" height="16" viewBox="0 0 16 16" data-unique="GAPRO-verified-abc123"><circle cx="8" cy="8" r="8" fill="#1a73e8"/><path d="M12 5.5L7 10.5L4 7.5L5.5 6L7 7.5L10.5 4L12 5.5Z" fill="white"/></svg></div>
-          <div class="email-subject">¡Grok 4 ya está en camino! 🚀</div>
-          <div class="email-snippet">Prepárate para el siguiente nivel de inteligencia artificial... solo falta un poco más de entrenamiento.</div>
-          <div class="email-date">14:22</div>
-        </div>
-
-        <!-- Más rows como antes -->
+      <div class="email-list" id="email-list">
+        <!-- Los correos se generan dinámicamente abajo -->
       </div>
     </section>
 
     <!-- Admin Panel -->
     <section id="admin-panel">
-      <h2>Panel de Admin</h2>
-      <p>Aquí puedes ver usuarios, contraseñas (demo plain text), y banear/desbanear.</p>
+      <h2>Panel de Administración</h2>
+
+      <h3>Usuarios</h3>
       <table class="user-table">
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Contraseña</th>
-            <th>Estado</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Usuario</th><th>Contraseña</th><th>Estado</th><th>Acción</th></tr></thead>
         <tbody id="user-list"></tbody>
+      </table>
+
+      <h3 style="margin-top:40px;">Denuncias / Reportes</h3>
+      <table class="report-table">
+        <thead><tr><th>Denunciado por</th><th>Correo reportado</th><th>Motivo</th><th>Fecha</th></tr></thead>
+        <tbody id="report-list"></tbody>
       </table>
     </section>
   </div>
 
   <script>
-    // Usuarios fake en localStorage (incluyendo admin)
+    // ──────────────────────────────────────────────
+    // Datos persistentes (localStorage)
+    // ──────────────────────────────────────────────
     const usersKey = 'zenmail_users';
+    const reportsKey = 'zenmail_reports';
+
     if (!localStorage.getItem(usersKey)) {
-      const defaultUsers = [
+      localStorage.setItem(usersKey, JSON.stringify([
         { username: 'admin', password: 'X7pQ#9LmT$4vK2eR!8wZ', banned: false },
         { username: 'user1', password: 'pass123', banned: false },
         { username: 'user2', password: 'secure456', banned: true },
         { username: 'user3', password: 'hello789', banned: false },
         { username: 'user4', password: 'world000', banned: false },
         { username: 'user5', password: 'zenmail111', banned: false }
-      ];
-      localStorage.setItem(usersKey, JSON.stringify(defaultUsers));
+      ]));
     }
 
+    if (!localStorage.getItem(reportsKey)) {
+      localStorage.setItem(reportsKey, JSON.stringify([]));
+    }
+
+    let currentUser = null;
     let isAdmin = false;
 
-    // Función login
+    // ──────────────────────────────────────────────
+    // Login
+    // ──────────────────────────────────────────────
     function login() {
-      const username = document.getElementById('username').value;
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       const users = JSON.parse(localStorage.getItem(usersKey));
       const user = users.find(u => u.username === username && u.password === password);
 
       if (user) {
+        if (user.banned) {
+          alert('Tu cuenta está baneada. Contacta al administrador.');
+          return;
+        }
+        currentUser = username;
+        isAdmin = (username === 'admin');
         document.getElementById('login-page').style.display = 'none';
         document.querySelector('header').style.display = 'flex';
         document.querySelector('.main').style.display = 'flex';
-        if (username === 'admin') {
-          isAdmin = true;
-          document.querySelector('.menu-item[onclick="showAdminPanel()"]').style.display = 'flex';
+        if (isAdmin) {
+          document.getElementById('admin-menu').style.display = 'flex';
         }
-        alert('¡Bienvenido, ' + username + '!');
+        loadEmails();
+        alert(`¡Bienvenido, ${username}!`);
       } else {
-        alert('Usuario o contraseña incorrecta.');
+        alert('Usuario o contraseña incorrectos.');
       }
     }
 
-    // Mostrar admin panel
-    function showAdminPanel() {
-      if (!isAdmin) return;
-      document.getElementById('email-content').style.display = 'none';
-      const adminPanel = document.getElementById('admin-panel');
-      adminPanel.style.display = 'block';
+    // ──────────────────────────────────────────────
+    // Cargar correos de ejemplo con botón denunciar
+    // ──────────────────────────────────────────────
+    function loadEmails() {
+      const list = document.getElementById('email-list');
+      list.innerHTML = '';
 
-      // Cargar usuarios en tabla
-      const users = JSON.parse(localStorage.getItem(usersKey));
-      const userList = document.getElementById('user-list');
-      userList.innerHTML = '';
-      users.forEach((user, index) => {
-        if (user.username === 'admin') return; // No mostrar admin en lista
-        const row = document.createElement('tr');
+      const fakeEmails = [
+        { from: 'equipo@xai.com', subject: '¡Grok 4 en camino! 🚀', snippet: 'Nuevo modelo ultra potente...', date: '14:22', unread: true },
+        { from: 'example@zenmail.com', subject: 'Oferta especial solo para ti', snippet: '50% descuento en premium este mes...', date: '10:15', unread: true },
+        { from: 'netflix@notifications.com', subject: 'Tu serie vuelve pronto', snippet: 'Stranger Things final season...', date: '12 mar', unread: false },
+        { from: 'github noreply@github.com', subject: 'Tu repo tiene 100 estrellas', snippet: '¡Felicidades por zenmail clon!...', date: '10 mar', unread: false },
+        { from: 'promociones@zenmail.com', subject: 'Gana almacenamiento extra', snippet: 'Refiere amigos y gana 10GB...', date: 'ayer', unread: false }
+      ];
+
+      fakeEmails.forEach(email => {
+        const row = document.createElement('div');
+        row.className = `email-row ${email.unread ? 'unread' : ''}`;
         row.innerHTML = `
-          <td>${user.username}</td>
-          <td>${user.password}</td>
-          <td>${user.banned ? 'Baneado' : 'Activo'}</td>
-          <td>
-            <button class="ban-btn ${user.banned ? 'banned' : ''}" onclick="toggleBan(${index})">
-              ${user.banned ? 'Desbanear' : 'Banear'}
-            </button>
-          </td>
+          <input type="checkbox" class="email-checkbox"/>
+          <span class="material-icons email-star">star_border</span>
+          <div class="email-from">${email.from}</div>
+          <div class="email-subject">${email.subject}</div>
+          <div class="email-snippet">${email.snippet}</div>
+          <div class="email-date">${email.date}</div>
+          <button class="report-btn" onclick="reportEmail('${email.from}', '${email.subject}')">Denunciar</button>
         `;
-        userList.appendChild(row);
+        row.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('report-btn')) {
+            row.classList.remove('unread');
+          }
+        });
+        list.appendChild(row);
       });
     }
 
-    // Toggle ban
+    // ──────────────────────────────────────────────
+    // Función Denunciar
+    // ──────────────────────────────────────────────
+    function reportEmail(from, subject) {
+      if (!currentUser) {
+        alert('Debes iniciar sesión para denunciar.');
+        return;
+      }
+
+      const motivo = prompt('Motivo de la denuncia (opcional):') || 'Sin motivo especificado';
+
+      const reports = JSON.parse(localStorage.getItem(reportsKey));
+      reports.push({
+        reportedBy: currentUser,
+        reportedEmail: from,
+        subject: subject,
+        motivo: motivo,
+        date: new Date().toLocaleString('es-CO')
+      });
+      localStorage.setItem(reportsKey, JSON.stringify(reports));
+
+      alert('¡Gracias! La denuncia ha sido enviada al administrador.');
+      if (isAdmin) loadAdminPanel(); // refrescar si ya estás en panel
+    }
+
+    // ──────────────────────────────────────────────
+    // Mostrar Admin Panel
+    // ──────────────────────────────────────────────
+    function showAdminPanel() {
+      if (!isAdmin) return;
+
+      document.getElementById('email-content').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+
+      // Usuarios
+      const users = JSON.parse(localStorage.getItem(usersKey));
+      const userList = document.getElementById('user-list');
+      userList.innerHTML = '';
+      users.forEach((u, i) => {
+        if (u.username === 'admin') return;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${u.username}</td>
+          <td>${u.password}</td>
+          <td>${u.banned ? 'Baneado' : 'Activo'}</td>
+          <td><button class="ban-btn ${u.banned ? 'banned' : ''}" onclick="toggleBan(${i})">${u.banned ? 'Desbanear' : 'Banear'}</button></td>
+        `;
+        userList.appendChild(tr);
+      });
+
+      // Reportes
+      const reports = JSON.parse(localStorage.getItem(reportsKey));
+      const reportList = document.getElementById('report-list');
+      reportList.innerHTML = '';
+      reports.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.reportedBy}</td>
+          <td>${r.reportedEmail}</td>
+          <td>${r.motivo}</td>
+          <td>${r.date}</td>
+        `;
+        reportList.appendChild(tr);
+      });
+    }
+
     function toggleBan(index) {
       const users = JSON.parse(localStorage.getItem(usersKey));
       users[index].banned = !users[index].banned;
       localStorage.setItem(usersKey, JSON.stringify(users));
-      showAdminPanel(); // Refrescar tabla
+      showAdminPanel();
     }
 
-    // Interacciones anteriores
-    document.querySelectorAll('.email-row').forEach(row => {
-      row.addEventListener('click', () => {
-        row.classList.remove('unread');
-      });
-    });
+    // Volver a inbox (puedes mejorar con más secciones después)
+    function showSection(section) {
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('email-content').style.display = 'flex';
+      // Aquí podrías filtrar correos por sección en el futuro
+    }
 
+    // ──────────────────────────────────────────────
+    // Eventos iniciales
+    // ──────────────────────────────────────────────
     document.querySelector('.compose-btn').addEventListener('click', () => {
-      alert('¡Redactando nuevo correo en ZenMail! (próximamente ventana modal ✨)');
+      alert('Redactar nuevo correo (próximamente modal completa)');
     });
-
-    // Ocultar admin menu por default
-    document.querySelector('.menu-item[onclick="showAdminPanel()"]').style.display = 'none';
   </script>
 </body>
 </html>
