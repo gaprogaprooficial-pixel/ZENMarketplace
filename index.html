@@ -2,117 +2,110 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS UNIVERSE | GLOBAL CONTROL v8.0</title>
+    <title>NEXUS UNIVERSE | MASTER RECOVERY v8.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        :root { --n-green: #00ffaa; --n-red: #ff3333; --n-gold: #facc15; }
-        body { background: #010101; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        :root { --n-green: #00ffaa; --n-red: #ff3333; }
+        body { background: #000; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,170,0.1); }
         .input-nexus { background: rgba(255,255,255,0.05); border: 1px solid var(--n-green); padding: 12px; border-radius: 12px; color: white; outline: none; text-align: center; }
         
-        /* Mensaje Global Pantalla Completa */
-        #global-alert { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(255, 0, 0, 0.9); backdrop-filter: blur(10px); flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        
-        /* Mantenimiento */
-        #maint-screen { display: none; position: fixed; inset: 0; z-index: 10000; background: #000; flex-direction: column; justify-content: center; align-items: center; }
+        /* Pantalla de Mantenimiento mejorada */
+        #maint-screen { 
+            display: none; position: fixed; inset: 0; z-index: 10000; 
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%); 
+            flex-direction: column; justify-content: center; align-items: center; 
+        }
 
         #app-shell, #modal-admin { display: none; }
-        .btn-admin { background: var(--n-red); color: white; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="maint-screen">
-    <div class="orbitron text-4xl mb-4 text-yellow-500 animate-pulse">SISTEMA EN MANTENIMIENTO</div>
-    <p class="text-gray-500 italic">El Arquitecto está optimizando el Núcleo. Regresa pronto.</p>
-</div>
-
-<div id="global-alert">
-    <div class="orbitron text-7xl font-black mb-4 tracking-tighter italic">ALERTA DEL SISTEMA</div>
-    <div id="global-msg-text" class="text-3xl font-bold uppercase max-w-4xl">MENSAJE DEL ADMINISTRADOR</div>
-    <button onclick="closeGlobal()" class="mt-10 border-2 border-white px-10 py-2 rounded-full font-black hover:bg-white hover:text-red-600">CERRAR AVISO</button>
+    <div class="orbitron text-5xl mb-4 text-yellow-500 animate-pulse">NEXUS BAJO ARREGLO</div>
+    <p class="text-gray-500 italic">Limpiando usuarios falsos y optimizando el núcleo...</p>
+    <button onclick="window.location.reload()" class="mt-10 text-[10px] border border-white/20 px-6 py-2 rounded-full">REINTENTAR CONEXIÓN</button>
 </div>
 
 <div id="login-gate" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
-    <div class="max-w-md w-full glass p-10 rounded-[40px] text-center">
+    <div class="max-w-md w-full glass p-10 rounded-[40px] text-center border-t-2 border-[#00ffaa]">
         <h1 class="orbitron text-3xl font-black mb-8 text-[#00ffaa]">NEXUS SECURITY</h1>
-        <div class="space-y-4">
+        <div class="space-y-4 text-left">
+            <label class="text-[9px] text-gray-500 ml-2 uppercase">Usuario Maestro</label>
             <input type="text" id="log-user" placeholder="USUARIO" class="input-nexus w-full">
-            <input type="password" id="key-alpha" placeholder="PASSWORD ALFA (DIFÍCIL)" class="input-nexus w-full">
-            <input type="password" id="key-beta" placeholder="PASSWORD BETA (DIFÍCIL)" class="input-nexus w-full">
-            <button onclick="intentarEntrar()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron mt-4">ENTRAR</button>
+            <label class="text-[9px] text-gray-500 ml-2 uppercase">Clave Alfa</label>
+            <input type="password" id="key-alpha" placeholder="PASSWORD 1" class="input-nexus w-full">
+            <label class="text-[9px] text-gray-500 ml-2 uppercase">Clave Beta</label>
+            <input type="password" id="key-beta" placeholder="PASSWORD 2" class="input-nexus w-full">
+            <button onclick="intentarEntrar()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron mt-4 hover:shadow-[0_0_20px_#00ffaa]">REPARAR Y ENTRAR</button>
         </div>
-        <p class="text-[9px] text-gray-600 mt-4">Admin: Maestro_Nexus_2026 / Pass 1: Admin!_@77#_X99_Z026 / Pass 2: Secure-Core#_9910-K_!!</p>
     </div>
 </div>
 
 <div id="app-shell" class="h-screen flex flex-col">
-    <header class="p-4 glass flex justify-between items-center">
+    <header class="p-6 glass flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <div id="u-img" class="w-10 h-10 bg-[#00ffaa] rounded-full"></div>
-            <span id="u-name" class="orbitron text-[#00ffaa] font-bold"></span>
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+            <span id="u-name" class="orbitron text-[#00ffaa] font-black text-xl"></span>
         </div>
-        <button id="admin-trigger" class="hidden bg-red-600 px-4 py-2 rounded-lg text-[10px] font-black orbitron" onclick="openAdmin()">ADMIN PANEL</button>
+        <div class="flex gap-4">
+            <button id="admin-trigger" class="hidden bg-red-600 px-6 py-2 rounded-xl text-[10px] font-black orbitron" onclick="openAdmin()">ADMIN PANEL</button>
+            <button onclick="cerrarSesion()" class="bg-white/5 px-4 py-2 rounded-xl text-[10px]">SALIR</button>
+        </div>
     </header>
-    <main class="flex-1 p-6 flex flex-col items-center justify-center text-center">
-        <h2 class="orbitron text-5xl italic opacity-20">BIENVENIDO AL NÚCLEO</h2>
-        <p class="text-gray-500 mt-4">El panel de control global está listo para tus órdenes.</p>
+    <main class="flex-1 flex flex-col items-center justify-center">
+        <div class="glass p-10 rounded-[50px] text-center">
+            <h2 class="orbitron text-2xl mb-2">SISTEMA REUPERADO</h2>
+            <p class="text-gray-500 text-xs">Usuarios falsos eliminados. Base de datos limpia.</p>
+        </div>
     </main>
 </div>
 
-<div id="modal-admin" class="fixed inset-0 z-[1000] bg-black p-10 flex flex-col overflow-hidden">
-    <div class="flex justify-between items-center mb-6 border-b border-red-600/30 pb-4">
-        <h2 class="orbitron text-3xl text-red-600 font-black">MODO DIOS: GLOBAL ADMIN</h2>
+<div id="modal-admin" class="fixed inset-0 z-[1000] bg-black/95 p-10 flex flex-col">
+    <div class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
+        <h2 class="orbitron text-3xl text-red-600 font-black italic">CONTROL MAESTRO</h2>
         <div class="flex gap-4">
-            <button onclick="toggleMaintenance()" class="bg-yellow-600 px-4 py-2 rounded text-[10px] font-bold">MANTENIMIENTO ON/OFF</button>
-            <button onclick="closeModal('modal-admin')" class="bg-white/10 px-4 py-2 rounded text-[10px]">CERRAR</button>
+            <button onclick="toggleMaintenance()" id="maint-btn" class="bg-yellow-600 px-6 py-2 rounded-xl text-[10px] font-bold"></button>
+            <button onclick="closeModal('modal-admin')" class="bg-white/10 px-6 py-2 rounded-xl text-[10px]">CERRAR</button>
         </div>
     </div>
-
-    <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
-        <div class="col-span-4 space-y-4">
-            <div class="glass p-6 rounded-2xl">
-                <h3 class="text-xs font-bold text-red-500 mb-4 uppercase">Mensaje Global de Pantalla</h3>
-                <textarea id="global-input" placeholder="Escribe el mensaje que todos verán..." class="w-full bg-black border border-white/10 rounded p-2 text-xs mb-4 h-24"></textarea>
-                <button onclick="sendGlobal()" class="w-full bg-red-600 py-2 rounded font-black text-xs">LANZAR EN TODA LA PANTALLA</button>
-            </div>
-        </div>
-
-        <div class="col-span-8 glass p-6 rounded-2xl overflow-y-auto">
-            <table class="w-full text-left text-[11px]">
-                <thead class="text-gray-500 border-b border-white/10 uppercase">
-                    <tr><th class="p-2">USUARIO</th><th class="p-2">LLAVES (ESPIAR)</th><th class="p-2">ESTADO</th><th class="p-2">ACCIONES</th></tr>
-                </thead>
-                <tbody id="admin-table"></tbody>
-            </table>
-        </div>
+    <div class="flex-1 overflow-y-auto">
+        <table class="w-full text-left">
+            <thead class="text-[10px] text-gray-500 uppercase border-b border-white/5">
+                <tr><th class="p-4">USUARIO</th><th class="p-4">LLAVES SECRETAS</th><th class="p-4">ACCIONES</th></tr>
+            </thead>
+            <tbody id="admin-table"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
-let users = JSON.parse(localStorage.getItem('nx8_u')) || [];
-let current = null;
-let isMaint = localStorage.getItem('nx8_maint') === 'true';
+const MASTER_USER = "Maestro_Nexus_2026";
+const MASTER_K1 = "Admin!_@77#_X99_Z026";
+const MASTER_K2 = "Secure-Core#_9910-K_!!";
 
-// Inicializar 100 usuarios
-if(users.length < 10) {
-    for(let i=1; i<=100; i++) {
-        let name = (i === 1) ? "Maestro_Nexus_2026" : `Player_${i.toString().padStart(3, '0')}`;
-        users.push({
-            name: name,
-            k1: (i === 1) ? "Admin!_@77#_X99_Z026" : `A${i}`,
-            k2: (i === 1) ? "Secure-Core#_9910-K_!!" : `B${i}`,
-            isAdmin: (i === 1), isBan: false
-        });
+let users = JSON.parse(localStorage.getItem('nx_clean_u')) || [];
+let isMaint = localStorage.getItem('nx_maint') === 'true';
+
+// --- LIMPIEZA Y RECONSTRUCCIÓN ---
+function rebuildDatabase() {
+    let cleanList = [];
+    // 1. Añadir Admin
+    cleanList.push({ name: MASTER_USER, k1: MASTER_K1, k2: MASTER_K2, isAdmin: true, isBan: false });
+    // 2. Añadir solo 10 Reales
+    for(let i=1; i<=10; i++) {
+        cleanList.push({ name: `Elite_User_${i}`, k1: `Alfa${i}`, k2: `Beta${i}`, isAdmin: false, isBan: false });
     }
+    users = cleanList;
     save();
 }
 
-// MANTENIMIENTO CHECK
-if(isMaint) document.getElementById('maint-screen').style.display = 'flex';
+if(users.length === 0 || users.length > 15) { rebuildDatabase(); }
 
+// --- LOGICA DE ACCESO ---
 function intentarEntrar() {
     const u = document.getElementById('log-user').value.trim();
     const k1 = document.getElementById('key-alpha').value.trim();
@@ -120,35 +113,32 @@ function intentarEntrar() {
     const found = users.find(x => x.name === u && x.k1 === k1 && x.k2 === k2);
 
     if(found) {
-        if(found.isBan) return alert("BANEADO.");
+        // SI ES ADMIN, ENTRA AUNQUE HAYA MANTENIMIENTO
+        if(isMaint && !found.isAdmin) {
+            document.getElementById('maint-screen').style.display = 'flex';
+            document.getElementById('login-gate').style.display = 'none';
+            return;
+        }
+        
         current = found;
         document.getElementById('login-gate').style.display = 'none';
         document.getElementById('app-shell').style.display = 'flex';
         document.getElementById('u-name').innerText = current.name;
         if(current.isAdmin) document.getElementById('admin-trigger').style.display = 'block';
-    } else { alert("ERROR"); }
+        updateMaintBtn();
+    } else { alert("ACCESO DENEGADO"); }
 }
-
-// --- FUNCIONES ADMIN ---
-function sendGlobal() {
-    const msg = document.getElementById('global-input').value;
-    if(!msg) return;
-    localStorage.setItem('nx8_global', msg);
-    mostrarGlobal(msg);
-}
-
-function mostrarGlobal(msg) {
-    document.getElementById('global-alert').style.display = 'flex';
-    document.getElementById('global-msg-text').innerText = msg;
-}
-
-function closeGlobal() { document.getElementById('global-alert').style.display = 'none'; }
 
 function toggleMaintenance() {
     isMaint = !isMaint;
-    localStorage.setItem('nx8_maint', isMaint);
-    alert(isMaint ? "MANTENIMIENTO ACTIVADO" : "MANTENIMIENTO DESACTIVADO");
-    location.reload();
+    localStorage.setItem('nx_maint', isMaint);
+    updateMaintBtn();
+    alert(isMaint ? "SISTEMA CERRADO AL PÚBLICO" : "SISTEMA ABIERTO");
+}
+
+function updateMaintBtn() {
+    const btn = document.getElementById('maint-btn');
+    if(btn) btn.innerText = isMaint ? "DESACTIVAR MANTENIMIENTO" : "ACTIVAR MANTENIMIENTO";
 }
 
 function openAdmin() {
@@ -156,24 +146,23 @@ function openAdmin() {
     const table = document.getElementById('admin-table');
     table.innerHTML = users.map(u => `
         <tr class="border-b border-white/5">
-            <td class="p-2 font-bold ${u.isAdmin?'text-yellow-500':''}">${u.name}</td>
-            <td class="p-2 font-mono text-gray-500">${u.k1} | ${u.k2}</td>
-            <td class="p-2">${u.isBan ? '<span class="text-red-500">BANEADO</span>' : '<span class="text-green-500">ACTIVO</span>'}</td>
-            <td class="p-2 flex gap-2">
-                <button onclick="toggleBan('${u.name}')" class="btn-admin">${u.isBan ? 'DESBANEAR' : 'BANEAR'}</button>
+            <td class="p-4 text-xs font-bold ${u.isAdmin?'text-yellow-500':''}">${u.name}</td>
+            <td class="p-4 font-mono text-[10px] text-gray-500">${u.k1} | ${u.k2}</td>
+            <td class="p-4">
+                ${u.isAdmin ? '' : `<button onclick="toggleBan('${u.name}')" class="bg-red-600/20 text-red-500 px-4 py-1 rounded-lg text-[10px]">${u.isBan?'DESBANEAR':'BANEAR'}</button>`}
             </td>
         </tr>
     `).join('');
 }
 
 function toggleBan(name) {
-    if(name === "Maestro_Nexus_2026") return;
     users = users.map(u => u.name === name ? {...u, isBan: !u.isBan} : u);
     save(); openAdmin();
 }
 
-function save() { localStorage.setItem('nx8_u', JSON.stringify(users)); }
+function save() { localStorage.setItem('nx_clean_u', JSON.stringify(users)); }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function cerrarSesion() { location.reload(); }
 </script>
 </body>
 </html>
