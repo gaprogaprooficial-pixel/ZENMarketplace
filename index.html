@@ -2,167 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS UNIVERSE | MASTER RECOVERY v8.1</title>
+    <title>NEXUS STUDIO & ENGINE | v9.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        :root { --n-green: #00ffaa; --n-red: #ff3333; }
-        body { background: #000; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        body { background: #050505; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,170,0.1); }
-        .input-nexus { background: rgba(255,255,255,0.05); border: 1px solid var(--n-green); padding: 12px; border-radius: 12px; color: white; outline: none; text-align: center; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,170,0.1); }
+        .grid-bg { background-size: 40px 40px; background-image: linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px); }
         
-        /* Pantalla de Mantenimiento mejorada */
-        #maint-screen { 
-            display: none; position: fixed; inset: 0; z-index: 10000; 
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%); 
-            flex-direction: column; justify-content: center; align-items: center; 
-        }
+        /* Render de Bloques */
+        .block { width: 40px; height: 40px; position: absolute; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .b-wall { background: #555; box-shadow: inset 0 0 10px #000; }
+        .b-water { background: #0066ff; opacity: 0.7; }
+        .b-lava { background: #ff4400; box-shadow: 0 0 15px #ff4400; }
+        .b-grass { background: #228822; }
 
-        #app-shell, #modal-admin { display: none; }
+        #app-shell, #modal-studio, #modal-player { display: none; }
+        .admin-glow { box-shadow: 0 0 15px rgba(255,0,0,0.3); border: 1px solid red; }
     </style>
 </head>
 <body>
 
-<div id="maint-screen">
-    <div class="orbitron text-5xl mb-4 text-yellow-500 animate-pulse">NEXUS BAJO ARREGLO</div>
-    <p class="text-gray-500 italic">Limpiando usuarios falsos y optimizando el núcleo...</p>
-    <button onclick="window.location.reload()" class="mt-10 text-[10px] border border-white/20 px-6 py-2 rounded-full">REINTENTAR CONEXIÓN</button>
-</div>
-
 <div id="login-gate" class="fixed inset-0 z-[500] flex items-center justify-center bg-black">
-    <div class="max-w-md w-full glass p-10 rounded-[40px] text-center border-t-2 border-[#00ffaa]">
-        <h1 class="orbitron text-3xl font-black mb-8 text-[#00ffaa]">NEXUS SECURITY</h1>
-        <div class="space-y-4 text-left">
-            <label class="text-[9px] text-gray-500 ml-2 uppercase">Usuario Maestro</label>
-            <input type="text" id="log-user" placeholder="USUARIO" class="input-nexus w-full">
-            <label class="text-[9px] text-gray-500 ml-2 uppercase">Clave Alfa</label>
-            <input type="password" id="key-alpha" placeholder="PASSWORD 1" class="input-nexus w-full">
-            <label class="text-[9px] text-gray-500 ml-2 uppercase">Clave Beta</label>
-            <input type="password" id="key-beta" placeholder="PASSWORD 2" class="input-nexus w-full">
-            <button onclick="intentarEntrar()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron mt-4 hover:shadow-[0_0_20px_#00ffaa]">REPARAR Y ENTRAR</button>
-        </div>
+    <div class="max-w-md w-full glass p-10 rounded-[40px] border-b-4 border-[#00ffaa]">
+        <h1 class="orbitron text-center text-3xl font-black mb-8 text-[#00ffaa]">NEXUS ENGINE</h1>
+        <input type="text" id="log-user" placeholder="USUARIO" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
+        <input type="password" id="key-alpha" placeholder="KEY ALFA" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
+        <input type="password" id="key-beta" placeholder="KEY BETA" class="w-full bg-white/5 border border-[#00ffaa]/30 p-4 rounded-xl mb-4 outline-none text-center">
+        <button onclick="intentarEntrar()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron">INICIAR SESIÓN</button>
     </div>
 </div>
 
 <div id="app-shell" class="h-screen flex flex-col">
-    <header class="p-6 glass flex justify-between items-center">
+    <header class="p-4 glass flex justify-between items-center z-50">
         <div class="flex items-center gap-4">
-            <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
-            <span id="u-name" class="orbitron text-[#00ffaa] font-black text-xl"></span>
+            <span id="u-name" class="orbitron font-black text-[#00ffaa]"></span>
+            <div class="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[10px] font-bold">🪙 <span id="u-coins">0</span></div>
         </div>
         <div class="flex gap-4">
-            <button id="admin-trigger" class="hidden bg-red-600 px-6 py-2 rounded-xl text-[10px] font-black orbitron" onclick="openAdmin()">ADMIN PANEL</button>
-            <button onclick="cerrarSesion()" class="bg-white/5 px-4 py-2 rounded-xl text-[10px]">SALIR</button>
+            <button onclick="openStudio()" class="bg-purple-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron">NEXUS STUDIO</button>
+            <button onclick="openGames()" class="bg-blue-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron">EXPLORAR JUEGOS</button>
+            <button id="admin-trigger" class="hidden bg-red-600 px-6 py-2 rounded-xl font-black text-[10px] orbitron" onclick="alert('Abriendo Panel Admin...')">ADMIN</button>
         </div>
     </header>
-    <main class="flex-1 flex flex-col items-center justify-center">
-        <div class="glass p-10 rounded-[50px] text-center">
-            <h2 class="orbitron text-2xl mb-2">SISTEMA REUPERADO</h2>
-            <p class="text-gray-500 text-xs">Usuarios falsos eliminados. Base de datos limpia.</p>
+
+    <main class="flex-1 flex items-center justify-center">
+        <div class="text-center">
+            <h2 class="orbitron text-6xl font-black opacity-10">THE MULTIVERSE</h2>
+            <p class="text-gray-600 mt-4">Selecciona Studio para crear o Explorar para jugar.</p>
         </div>
     </main>
 </div>
 
-<div id="modal-admin" class="fixed inset-0 z-[1000] bg-black/95 p-10 flex flex-col">
-    <div class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
-        <h2 class="orbitron text-3xl text-red-600 font-black italic">CONTROL MAESTRO</h2>
-        <div class="flex gap-4">
-            <button onclick="toggleMaintenance()" id="maint-btn" class="bg-yellow-600 px-6 py-2 rounded-xl text-[10px] font-bold"></button>
-            <button onclick="closeModal('modal-admin')" class="bg-white/10 px-6 py-2 rounded-xl text-[10px]">CERRAR</button>
+<div id="modal-studio" class="fixed inset-0 z-[600] bg-[#111] flex flex-col">
+    <div class="p-4 glass flex justify-between items-center">
+        <h2 class="orbitron text-purple-500 font-black">NEXUS STUDIO v1.0</h2>
+        <div class="flex gap-2">
+            <select id="tool-type" class="bg-black text-white p-2 rounded border border-purple-500 text-xs">
+                <option value="b-grass">BLOQUE: PASTO</option>
+                <option value="b-wall">BLOQUE: MURO</option>
+                <option value="b-water">BLOQUE: AGUA</option>
+                <option value="b-lava">BLOQUE: LAVA</option>
+            </select>
+            <button onclick="saveMyGame()" class="bg-green-600 px-4 py-2 rounded text-xs font-bold">PUBLICAR JUEGO</button>
+            <button onclick="closeStudio()" class="bg-red-600 px-4 py-2 rounded text-xs font-bold">SALIR</button>
         </div>
     </div>
-    <div class="flex-1 overflow-y-auto">
-        <table class="w-full text-left">
-            <thead class="text-[10px] text-gray-500 uppercase border-b border-white/5">
-                <tr><th class="p-4">USUARIO</th><th class="p-4">LLAVES SECRETAS</th><th class="p-4">ACCIONES</th></tr>
-            </thead>
-            <tbody id="admin-table"></tbody>
-        </table>
+    <div id="editor-viewport" class="flex-1 relative grid-bg overflow-hidden cursor-crosshair" onclick="placeBlock(event)">
+        </div>
+    <div class="p-2 bg-black text-[10px] text-gray-500">Haz clic en la cuadrícula para colocar bloques. Costo: 5 Coins por bloque.</div>
+</div>
+
+<div id="modal-player" class="fixed inset-0 z-[700] bg-black/95 p-10 overflow-y-auto">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="orbitron text-4xl font-black text-blue-500">JUEGOS DE LA COMUNIDAD</h2>
+            <button onclick="closeGames()" class="bg-white/10 px-6 py-2 rounded">VOLVER</button>
+        </div>
+        <div id="games-grid" class="grid grid-cols-3 gap-6"></div>
     </div>
 </div>
 
 <script>
-const MASTER_USER = "Maestro_Nexus_2026";
-const MASTER_K1 = "Admin!_@77#_X99_Z026";
-const MASTER_K2 = "Secure-Core#_9910-K_!!";
-
 let users = JSON.parse(localStorage.getItem('nx_clean_u')) || [];
-let isMaint = localStorage.getItem('nx_maint') === 'true';
+let worldData = JSON.parse(localStorage.getItem('nx_worlds')) || [];
+let current = null;
+let myBlocks = [];
 
-// --- LIMPIEZA Y RECONSTRUCCIÓN ---
-function rebuildDatabase() {
-    let cleanList = [];
-    // 1. Añadir Admin
-    cleanList.push({ name: MASTER_USER, k1: MASTER_K1, k2: MASTER_K2, isAdmin: true, isBan: false });
-    // 2. Añadir solo 10 Reales
-    for(let i=1; i<=10; i++) {
-        cleanList.push({ name: `Elite_User_${i}`, k1: `Alfa${i}`, k2: `Beta${i}`, isAdmin: false, isBan: false });
-    }
-    users = cleanList;
-    save();
-}
-
-if(users.length === 0 || users.length > 15) { rebuildDatabase(); }
-
-// --- LOGICA DE ACCESO ---
 function intentarEntrar() {
-    const u = document.getElementById('log-user').value.trim();
-    const k1 = document.getElementById('key-alpha').value.trim();
-    const k2 = document.getElementById('key-beta').value.trim();
+    const u = document.getElementById('log-user').value;
+    const k1 = document.getElementById('key-alpha').value;
+    const k2 = document.getElementById('key-beta').value;
     const found = users.find(x => x.name === u && x.k1 === k1 && x.k2 === k2);
 
     if(found) {
-        // SI ES ADMIN, ENTRA AUNQUE HAYA MANTENIMIENTO
-        if(isMaint && !found.isAdmin) {
-            document.getElementById('maint-screen').style.display = 'flex';
-            document.getElementById('login-gate').style.display = 'none';
-            return;
-        }
-        
         current = found;
+        if(!current.coins) current.coins = 500; // Monedas iniciales
         document.getElementById('login-gate').style.display = 'none';
         document.getElementById('app-shell').style.display = 'flex';
         document.getElementById('u-name').innerText = current.name;
+        document.getElementById('u-coins').innerText = current.coins;
         if(current.isAdmin) document.getElementById('admin-trigger').style.display = 'block';
-        updateMaintBtn();
-    } else { alert("ACCESO DENEGADO"); }
+    } else { alert("ERROR"); }
 }
 
-function toggleMaintenance() {
-    isMaint = !isMaint;
-    localStorage.setItem('nx_maint', isMaint);
-    updateMaintBtn();
-    alert(isMaint ? "SISTEMA CERRADO AL PÚBLICO" : "SISTEMA ABIERTO");
+// --- LOGICA DE STUDIO ---
+function openStudio() { 
+    document.getElementById('modal-studio').style.display = 'flex'; 
+    myBlocks = [];
+    document.getElementById('editor-viewport').innerHTML = '';
 }
 
-function updateMaintBtn() {
-    const btn = document.getElementById('maint-btn');
-    if(btn) btn.innerText = isMaint ? "DESACTIVAR MANTENIMIENTO" : "ACTIVAR MANTENIMIENTO";
+function placeBlock(e) {
+    if(current.coins < 5) return alert("SIN MONEDAS");
+    
+    const x = Math.floor(e.clientX / 40) * 40;
+    const y = Math.floor((e.clientY - 60) / 40) * 40;
+    const type = document.getElementById('tool-type').value;
+
+    const block = document.createElement('div');
+    block.className = `block ${type}`;
+    block.style.left = x + 'px';
+    block.style.top = y + 'px';
+    document.getElementById('editor-viewport').appendChild(block);
+
+    myBlocks.push({ x, y, type });
+    current.coins -= 5;
+    document.getElementById('u-coins').innerText = current.coins;
 }
 
-function openAdmin() {
-    document.getElementById('modal-admin').style.display = 'flex';
-    const table = document.getElementById('admin-table');
-    table.innerHTML = users.map(u => `
-        <tr class="border-b border-white/5">
-            <td class="p-4 text-xs font-bold ${u.isAdmin?'text-yellow-500':''}">${u.name}</td>
-            <td class="p-4 font-mono text-[10px] text-gray-500">${u.k1} | ${u.k2}</td>
-            <td class="p-4">
-                ${u.isAdmin ? '' : `<button onclick="toggleBan('${u.name}')" class="bg-red-600/20 text-red-500 px-4 py-1 rounded-lg text-[10px]">${u.isBan?'DESBANEAR':'BANEAR'}</button>`}
-            </td>
-        </tr>
+function saveMyGame() {
+    const name = prompt("NOMBRE DEL JUEGO:");
+    if(!name) return;
+    
+    worldData.push({
+        id: Date.now(),
+        name: name,
+        creator: current.name,
+        data: myBlocks
+    });
+    localStorage.setItem('nx_worlds', JSON.stringify(worldData));
+    alert("JUEGO PUBLICADO EN EL MULTIVERSO");
+    closeStudio();
+}
+
+// --- LOGICA DE EXPLORADOR ---
+function openGames() {
+    document.getElementById('modal-player').style.display = 'block';
+    const grid = document.getElementById('games-grid');
+    grid.innerHTML = worldData.map(w => `
+        <div class="glass p-6 rounded-3xl border border-blue-500/20 hover:border-blue-500 transition-all">
+            <h3 class="orbitron text-xl mb-2">${w.name}</h3>
+            <p class="text-[10px] text-gray-500 mb-4">CREADO POR: ${w.creator}</p>
+            <button onclick="playGame(${w.id})" class="w-full bg-blue-600 py-3 rounded-xl font-black text-xs">JUGAR</button>
+        </div>
     `).join('');
 }
 
-function toggleBan(name) {
-    users = users.map(u => u.name === name ? {...u, isBan: !u.isBan} : u);
-    save(); openAdmin();
+function playGame(id) {
+    const world = worldData.find(w => w.id === id);
+    // Simulación de carga de motor
+    alert(`Entrando a ${world.name}...\nCargando ${world.data.length} bloques...`);
+    // Aquí se renderizarían los bloques en un visor 3D o 2D
 }
 
-function save() { localStorage.setItem('nx_clean_u', JSON.stringify(users)); }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function cerrarSesion() { location.reload(); }
+function closeStudio() { document.getElementById('modal-studio').style.display = 'none'; }
+function closeGames() { document.getElementById('modal-player').style.display = 'none'; }
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 </script>
 </body>
 </html>
