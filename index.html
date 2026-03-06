@@ -2,195 +2,252 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS ENGINE v10.0 | FULL STUDIO</title>
+    <title>NEXUS MULTIVERSE 3D | v11.0 MASTER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
         body { background: #000; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; margin: 0; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         
-        /* Escenario */
-        #game-container { width: 100vw; height: 100vh; position: relative; background: #111; overflow: hidden; }
-        .grid-layer { position: absolute; inset: 0; background-size: 50px 50px; background-image: linear-gradient(to right, #222 1px, transparent 1px), linear-gradient(to bottom, #222 1px, transparent 1px); }
-        
-        /* Entidades */
-        .entity { width: 50px; height: 50px; position: absolute; transition: all 0.1s linear; box-sizing: border-box; }
-        .player { background: #00ffaa; border-radius: 10px; z-index: 100; border: 3px solid #fff; box-shadow: 0 0 20px #00ffaa; }
-        .player-head { width: 20px; height: 20px; background: #fff; margin: 5px auto; border-radius: 5px; }
-        
-        /* Tipos de Bloques */
-        .b-wall { background: #444; border: 4px solid #333; z-index: 10; } /* Sólido */
-        .b-lava { background: #ff4400; box-shadow: inset 0 0 15px #000; z-index: 5; } /* Script: Daño */
-        .b-coin { background: #facc15; border-radius: 50%; transform: scale(0.5); z-index: 5; } /* Script: Dinero */
-        .b-portal { background: #9333ea; animation: pulse 1s infinite; z-index: 5; }
+        /* MOTOR 3D PSEUDO */
+        #viewport { width: 100vw; height: 100vh; perspective: 1000px; background: radial-gradient(circle, #111 0%, #000 100%); }
+        #world { 
+            position: absolute; width: 2000px; height: 2000px; 
+            transform-style: preserve-3d; transition: transform 0.1s ease-out;
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
+        }
 
-        /* Chat en Juego */
-        .bubble { position: absolute; background: white; color: black; padding: 5px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; width: max-content; bottom: 60px; left: 50%; transform: translateX(-50%); pointer-events: none; }
+        /* ENTIDADES */
+        .cube { 
+            position: absolute; width: 50px; height: 50px; transform-style: preserve-3d; 
+            transition: 0.2s; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .player { 
+            width: 40px; height: 40px; background: #00ffaa; position: absolute; 
+            z-index: 100; box-shadow: 0 0 30px #00ffaa; border-radius: 8px;
+            transform: translateZ(20px);
+        }
 
-        #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+        /* INTERFAZ */
+        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,170,0.2); }
+        .input-n { background: rgba(255,255,255,0.05); border: 1px solid #00ffaa; padding: 10px; border-radius: 8px; color: white; outline: none; }
+        
+        #ui-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
         .interactive { pointer-events: auto; }
-        #studio-panel { display: none; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #login-screen, #admin-panel, #mod-menu { display: none; }
+        
+        /* MODS VIZ */
+        .mod-active { color: #00ffaa; text-shadow: 0 0 10px #00ffaa; }
+        .b-wall { background: #333; transform: translateZ(25px); border: 2px solid #444; }
+        .b-lava { background: #ff4400; box-shadow: inset 0 0 20px #000; }
+        .bubble { position: absolute; background: white; color: black; padding: 4px 8px; border-radius: 8px; font-size: 10px; bottom: 50px; white-space: nowrap; }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div class="grid-layer"></div>
-    <div id="world"></div>
-    <div id="player" class="entity player">
-        <div class="player-head"></div>
-        <div id="player-bubble" class="bubble" style="display:none"></div>
+<div id="viewport">
+    <div id="world">
+        <div id="player" class="player"><div id="p-bubble" class="bubble" style="display:none"></div></div>
     </div>
 </div>
 
-<div id="ui-layer">
-    <div class="p-6 flex justify-between items-end h-full">
-        <div class="space-y-4 interactive">
-            <div class="glass p-4 rounded-2xl border border-white/10 bg-black/50">
-                <p class="orbitron text-[#00ffaa] text-sm">NEXUS OS v10.0</p>
-                <p class="text-[10px] text-yellow-500 font-bold">COINS: <span id="coin-count">500</span></p>
+<div id="ui-overlay">
+    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-black/90 interactive">
+        <div class="glass p-10 rounded-[40px] w-96 text-center border-t-4 border-[#00ffaa]">
+            <h1 class="orbitron text-3xl font-black mb-6 text-[#00ffaa]">NEXUS ENTRY</h1>
+            <div class="space-y-4">
+                <input type="text" id="log-u" placeholder="USUARIO" class="input-n w-full">
+                <input type="password" id="log-k1" placeholder="KEY ALFA" class="input-n w-full">
+                <input type="password" id="log-k2" placeholder="KEY BETA" class="input-n w-full">
+                <button onclick="auth()" class="w-full bg-[#00ffaa] text-black font-black py-3 rounded-xl orbitron">INICIAR SESIÓN</button>
             </div>
-            <div class="w-80 h-40 glass rounded-xl bg-black/60 p-2 overflow-y-auto text-[10px]" id="chat-logs"></div>
-            <input type="text" id="chat-input" placeholder="Presiona Enter para hablar..." class="w-80 bg-black/80 border border-[#00ffaa] p-2 rounded text-xs outline-none">
+        </div>
+    </div>
+
+    <div id="hud" class="p-6 flex justify-between items-end h-full">
+        <div class="interactive flex flex-col gap-4">
+            <div class="glass p-4 rounded-2xl w-64">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="display-name" class="orbitron text-[#00ffaa] text-xs font-bold">INVITADO</span>
+                    <span class="text-yellow-500 text-[10px]">🪙 <span id="display-coins">0</span></span>
+                </div>
+                <div id="chat-box" class="h-32 overflow-y-auto text-[9px] text-gray-400 mb-2 border-b border-white/5"></div>
+                <input type="text" id="chat-in" placeholder="Presiona ENTER..." class="w-full bg-transparent text-xs outline-none">
+            </div>
         </div>
 
-        <div class="flex flex-col gap-2 interactive">
-            <button onclick="toggleStudio()" class="bg-purple-600 px-6 py-3 rounded-xl font-black orbitron text-xs">ABRIR STUDIO</button>
-            <button id="admin-btn" class="hidden bg-red-600 px-6 py-3 rounded-xl font-black orbitron text-xs">ADMIN PANEL</button>
+        <div class="interactive flex flex-col gap-2">
+            <button onclick="toggleMenu('mod-menu')" class="bg-blue-600 px-6 py-2 rounded-lg text-[10px] font-black orbitron">MODS & SCRIPTS</button>
+            <button id="admin-btn" onclick="toggleMenu('admin-panel')" class="hidden bg-red-600 px-6 py-2 rounded-lg text-[10px] font-black orbitron">MASTER PANEL</button>
+            <button onclick="logout()" class="bg-white/10 px-6 py-2 rounded-lg text-[10px] font-black orbitron">CERRAR SESIÓN</button>
         </div>
     </div>
 </div>
 
-<div id="studio-panel" class="fixed top-0 right-0 w-64 h-full bg-[#111] border-l border-purple-500 p-6 flex flex-col gap-4 z-[2000]">
-    <h2 class="orbitron text-purple-500 font-black">STUDIO TOOL</h2>
-    <hr class="border-white/10">
-    <label class="text-[10px]">TIPO DE BLOQUE</label>
-    <select id="block-type" class="bg-black border border-white/20 p-2 rounded text-xs">
-        <option value="b-wall">MURO (SÓLIDO)</option>
-        <option value="b-lava">LAVA (SCRIPT: KILL)</option>
-        <option value="b-coin">COIN (SCRIPT: GIVE)</option>
-        <option value="b-portal">PORTAL (SCRIPT: WIN)</option>
-    </select>
-    <div class="mt-auto space-y-2">
-        <button onclick="saveWorld()" class="w-full bg-green-600 py-2 rounded font-bold text-xs">GUARDAR MAPA</button>
-        <button onclick="toggleStudio()" class="w-full bg-white/10 py-2 rounded font-bold text-xs">CERRAR STUDIO</button>
+<div id="admin-panel" class="fixed inset-0 bg-black/95 z-[2000] p-10 interactive">
+    <div class="flex justify-between border-b border-red-600 pb-4 mb-6">
+        <h2 class="orbitron text-2xl text-red-600">ADMIN CONTROL CENTER</h2>
+        <button onclick="toggleMenu('admin-panel')" class="text-xs">X</button>
+    </div>
+    <div class="grid grid-cols-2 gap-10">
+        <div class="glass p-6">
+            <h3 class="text-xs text-[#00ffaa] mb-4">USUARIOS CONECTADOS</h3>
+            <div id="admin-user-list" class="space-y-2"></div>
+        </div>
+        <div class="glass p-6">
+            <h3 class="text-xs text-red-500 mb-4">COMANDOS GLOBALES</h3>
+            <button onclick="globalAlert()" class="w-full bg-red-600 py-2 rounded mb-2 text-xs">ALERTA PANTALLA COMPLETA</button>
+            <button onclick="toggleMaint()" class="w-full bg-yellow-600 py-2 rounded text-xs">ALTERNAR MANTENIMIENTO</button>
+        </div>
+    </div>
+</div>
+
+<div id="mod-menu" class="fixed right-6 top-1/4 glass p-6 w-64 rounded-2xl interactive">
+    <h3 class="orbitron text-[#00ffaa] text-xs mb-4">MODS DISPONIBLES</h3>
+    <div class="space-y-3">
+        <button onclick="activateMod('speed')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">FLASH SPEED (50 Coins)</button>
+        <button onclick="activateMod('ghost')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">GHOST MODE (100 Coins)</button>
+        <button onclick="activateMod('build')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">FAST BUILDER (Free)</button>
     </div>
 </div>
 
 <script>
-// --- CONFIGURACIÓN INICIAL ---
-let px = 100, py = 100;
-let blocks = JSON.parse(localStorage.getItem('nx_world_blocks')) || [];
-let studioMode = false;
-let coins = 500;
+// --- CORE ---
+let users = JSON.parse(localStorage.getItem('nx_u')) || [
+    { name: "Maestro_Nexus_2026", k1: "Admin!_@77#_X99_Z026", k2: "Secure-Core#_9910-K_!!", isAdmin: true, coins: 999999 }
+];
+let worldBlocks = JSON.parse(localStorage.getItem('nx_w')) || [];
+let current = null;
+let posX = 500, posY = 500;
+let speed = 10;
 
-const player = document.getElementById('player');
-const world = document.getElementById('world');
+// --- AUTH ---
+function auth() {
+    const u = document.getElementById('log-u').value;
+    const k1 = document.getElementById('log-k1').value;
+    const k2 = document.getElementById('log-k2').value;
+    const found = users.find(x => x.name === u && x.k1 === k1 && x.k2 === k2);
 
-// --- MOTOR DE MOVIMIENTO Y COLISIÓN ---
-document.addEventListener('keydown', (e) => {
-    if(document.activeElement.tagName === 'INPUT') return;
-    
-    let nextX = px, nextY = py;
-    const speed = 50;
-
-    if(e.key === 'ArrowUp') nextY -= speed;
-    if(e.key === 'ArrowDown') nextY += speed;
-    if(e.key === 'ArrowLeft') nextX -= speed;
-    if(e.key === 'ArrowRight') nextX += speed;
-
-    if(!checkCollision(nextX, nextY)) {
-        px = nextX; py = nextY;
-        updatePlayer();
-        checkScripts(px, py);
+    if(found) {
+        current = found;
+        document.getElementById('login-screen').style.display = 'none';
+        initGame();
+    } else {
+        // Registro automático si no existe
+        let newUser = { name: u, k1: k1, k2: k2, isAdmin: false, coins: 100 };
+        users.push(newUser);
+        current = newUser;
+        localStorage.setItem('nx_u', JSON.stringify(users));
+        document.getElementById('login-screen').style.display = 'none';
+        initGame();
     }
+}
+
+function initGame() {
+    document.getElementById('display-name').innerText = current.name;
+    document.getElementById('display-coins').innerText = current.coins;
+    if(current.isAdmin) document.getElementById('admin-btn').style.display = 'block';
+    renderWorld();
+    updateCam();
+}
+
+// --- MOTOR DE JUEGO & CÁMARA ---
+function updateCam() {
+    const world = document.getElementById('world');
+    const p = document.getElementById('player');
+    // Seguimiento de cámara
+    world.style.transform = `rotateX(45deg) rotateZ(0deg) translate3d(${-posX + window.innerWidth/2}px, ${-posY + window.innerHeight/2}px, 0)`;
+    p.style.left = posX + 'px';
+    p.style.top = posY + 'px';
+}
+
+window.addEventListener('keydown', (e) => {
+    if(!current || document.activeElement.tagName === 'INPUT') return;
+    if(e.key === 'w' || e.key === 'ArrowUp') posY -= speed;
+    if(e.key === 's' || e.key === 'ArrowDown') posY += speed;
+    if(e.key === 'a' || e.key === 'ArrowLeft') posX -= speed;
+    if(e.key === 'd' || e.key === 'ArrowRight') posX += speed;
+    updateCam();
 });
 
-function checkCollision(nx, ny) {
-    // Colisión con muros (bloques tipo b-wall)
-    return blocks.some(b => b.x === nx && b.y === ny && b.type === 'b-wall');
-}
-
-function checkScripts(nx, ny) {
-    blocks.forEach((b, index) => {
-        if(b.x === nx && b.y === ny) {
-            if(b.type === 'b-lava') {
-                alert("TE QUEMASTE EN LA LAVA");
-                px = 100; py = 100; updatePlayer();
-            }
-            if(b.type === 'b-coin') {
-                coins += 50;
-                document.getElementById('coin-count').innerText = coins;
-                blocks.splice(index, 1); // Desaparece al recoger
-                renderWorld();
-            }
-        }
-    });
-}
-
-function updatePlayer() {
-    player.style.left = px + 'px';
-    player.style.top = py + 'px';
-}
-
-// --- SISTEMA DE STUDIO ---
-document.getElementById('game-container').onclick = function(e) {
-    if(!studioMode) return;
-    const x = Math.floor(e.clientX / 50) * 50;
-    const y = Math.floor(e.clientY / 50) * 50;
-    const type = document.getElementById('block-type').value;
-
-    // Quitar bloque si ya existe en esa posición
-    const existing = blocks.findIndex(b => b.x === x && b.y === y);
-    if(existing !== -1) blocks.splice(existing, 1);
-
-    blocks.push({ x, y, type });
-    renderWorld();
-};
-
-function renderWorld() {
-    world.innerHTML = blocks.map(b => `
-        <div class="entity ${b.type}" style="left:${b.x}px; top:${b.y}px"></div>
-    `).join('');
-}
-
-function toggleStudio() {
-    studioMode = !studioMode;
-    document.getElementById('studio-panel').style.display = studioMode ? 'flex' : 'none';
-    alert(studioMode ? "MODO STUDIO: Haz clic en el suelo para poner bloques." : "MODO JUEGO: Usa las flechas para moverte.");
-}
-
-// --- SISTEMA DE CHAT ---
-const chatInput = document.getElementById('chat-input');
-const bubble = document.getElementById('player-bubble');
-
-chatInput.onkeypress = function(e) {
-    if(e.key === 'Enter' && this.value.trim() !== "") {
-        const msg = this.value;
-        // Mostrar burbuja sobre el jugador
-        bubble.innerText = msg;
+// --- CHAT ---
+document.getElementById('chat-in').onkeypress = function(e) {
+    if(e.key === 'Enter' && this.value !== "") {
+        const bubble = document.getElementById('p-bubble');
+        bubble.innerText = this.value;
         bubble.style.display = 'block';
-        
-        // Log en la caja de chat
         const log = document.createElement('div');
-        log.innerHTML = `<b class="text-[#00ffaa]">TÚ:</b> ${msg}`;
-        document.getElementById('chat-logs').appendChild(log);
-        document.getElementById('chat-logs').scrollTop = 9999;
-
+        log.innerHTML = `<b>${current.name}:</b> ${this.value}`;
+        document.getElementById('chat-box').appendChild(log);
+        document.getElementById('chat-box').scrollTop = 9999;
         setTimeout(() => bubble.style.display = 'none', 3000);
         this.value = "";
     }
 };
 
-function saveWorld() {
-    localStorage.setItem('nx_world_blocks', JSON.stringify(blocks));
-    alert("MAPA GUARDADO EN LA NUBE.");
+// --- MODS ---
+function activateMod(type) {
+    if(type === 'speed') {
+        if(current.coins < 50) return alert("Pobre");
+        speed = 30;
+        current.coins -= 50;
+        alert("MOD: SUPER VELOCIDAD ACTIVADA");
+    }
+    if(type === 'build') {
+        alert("MOD: Clic en el suelo para colocar muros (Gratis Admin)");
+        window.onclick = (e) => {
+            const wx = Math.floor(posX / 50) * 50;
+            const wy = Math.floor(posY / 50) * 50;
+            worldBlocks.push({x: wx, y: wy, type: 'b-wall'});
+            renderWorld();
+        };
+    }
+    document.getElementById('display-coins').innerText = current.coins;
 }
 
-// Inicializar
-renderWorld();
-updatePlayer();
+function renderWorld() {
+    const w = document.getElementById('world');
+    const p = document.getElementById('player');
+    w.innerHTML = ''; 
+    w.appendChild(p);
+    worldBlocks.forEach(b => {
+        const el = document.createElement('div');
+        el.className = `cube ${b.type}`;
+        el.style.left = b.x + 'px';
+        el.style.top = b.y + 'px';
+        w.appendChild(el);
+    });
+}
+
+// --- ADMIN ---
+function toggleMenu(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    if(id === 'admin-panel') {
+        document.getElementById('admin-user-list').innerHTML = users.map(u => `
+            <div class="flex justify-between text-[10px] bg-white/5 p-2 rounded">
+                <span>${u.name} (Coins: ${u.coins})</span>
+                <span class="text-gray-500">${u.k1} | ${u.k2}</span>
+                <button onclick="ban('${u.name}')" class="text-red-500">BAN</button>
+            </div>
+        `).join('');
+    }
+}
+
+function globalAlert() {
+    const m = prompt("MENSAJE GLOBAL:");
+    alert("📢 ALERTA GLOBAL: " + m);
+}
+
+function logout() { location.reload(); }
+function toggleMenu(id) {
+    const m = document.getElementById(id);
+    m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+}
+
+// Mostrar Login al inicio
+document.getElementById('login-screen').style.display = 'flex';
 </script>
 </body>
 </html>
