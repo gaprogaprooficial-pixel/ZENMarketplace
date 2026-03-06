@@ -2,149 +2,218 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS MARKET | Vende y Compra</title>
+    <title>NEXUS MARKET ULTRA | v13.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        body { background: #0a0a0a; color: white; font-family: 'JetBrains Mono', monospace; }
+        body { background: #020202; color: white; font-family: 'JetBrains Mono', monospace; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(0, 255, 170, 0.1); }
-        .input-nexus { background: #151515; border: 1px solid #333; padding: 12px; border-radius: 10px; color: white; outline: none; transition: 0.3s; }
-        .input-nexus:focus { border-color: #00ffaa; box-shadow: 0 0 10px rgba(0, 255, 170, 0.2); }
-        .card-prod { transition: 0.3s; border: 1px solid #222; }
-        .card-prod:hover { transform: translateY(-5px); border-color: #00ffaa; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
-        #modal-sell { display: none; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0, 255, 170, 0.1); }
+        .input-nexus { background: #0a0a0a; border: 1px solid #222; padding: 12px; border-radius: 12px; color: white; outline: none; width: 100%; }
+        .input-nexus:focus { border-color: #00ffaa; }
+        .badge-verified { background: linear-gradient(45deg, #00ffaa, #00d4ff); color: black; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: 900; text-transform: uppercase; box-shadow: 0 0 10px #00ffaa; }
+        #admin-panel, #login-screen { display: none; }
+        .p-img { width: 100%; height: 180px; object-fit: cover; border-radius: 20px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
-    <header class="max-w-7xl mx-auto flex justify-between items-center mb-12">
-        <div>
-            <h1 class="orbitron text-3xl font-black text-[#00ffaa] italic">NEXUS MARKET</h1>
-            <p class="text-[10px] text-gray-500 tracking-[0.3em]">SISTEMA DE COMERCIO GLOBAL 2026</p>
+    <div id="login-screen" class="fixed inset-0 z-[5000] bg-black flex items-center justify-center p-4">
+        <div class="glass max-w-sm w-full p-8 rounded-[40px] text-center">
+            <h2 class="orbitron text-[#00ffaa] mb-6">NEXUS LOGIN</h2>
+            <input type="text" id="u-in" placeholder="USUARIO" class="input-nexus mb-4 text-center">
+            <input type="password" id="p1-in" placeholder="KEY ALFA" class="input-nexus mb-4 text-center">
+            <input type="password" id="p2-in" placeholder="KEY BETA" class="input-nexus mb-6 text-center">
+            <button onclick="login()" class="w-full bg-[#00ffaa] text-black py-4 rounded-xl font-black orbitron">ENTRAR AL SISTEMA</button>
         </div>
-        <button onclick="toggleSell(true)" class="bg-[#00ffaa] text-black px-8 py-3 rounded-full font-black orbitron text-xs hover:scale-105 transition-all">
-            + PUBLICAR PRODUCTO
-        </button>
-    </header>
+    </div>
 
-    <main class="max-w-7xl mx-auto">
-        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div id="app" style="display:none">
+        <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 gap-6">
+            <div class="orbitron">
+                <h1 class="text-3xl font-black text-[#00ffaa]">NEXUS <span class="text-white">MARKET</span></h1>
+                <p class="text-[9px] text-gray-500 uppercase">Status: <span id="status-display">Conectado</span></p>
             </div>
-    </main>
 
-    <div id="modal-sell" class="fixed inset-0 z-[1000] bg-black/90 flex items-center justify-center p-4">
-        <div class="glass w-full max-w-lg p-8 rounded-[30px] relative">
-            <button onclick="toggleSell(false)" class="absolute top-6 right-6 text-gray-500 hover:text-white">✕</button>
+            <div class="relative w-full max-w-md">
+                <input type="text" id="search-bar" oninput="search()" placeholder="Buscar productos o usuarios..." class="input-nexus pl-12">
+                <span class="absolute left-4 top-3.5 opacity-30">🔍</span>
+            </div>
+
+            <div class="flex gap-4">
+                <button id="admin-btn" onclick="toggleAdmin()" class="hidden bg-red-600/20 text-red-500 px-4 py-2 rounded-lg text-xs font-bold border border-red-600/50">ADMIN PANEL</button>
+                <button onclick="logout()" class="bg-white/5 px-4 py-2 rounded-lg text-xs">CERRAR</button>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto mb-10">
+            <button onclick="openSell()" class="w-full bg-gradient-to-r from-[#00ffaa] to-[#00d4ff] text-black py-4 rounded-2xl font-black orbitron uppercase tracking-widest hover:opacity-90 transition-all">
+                + PUBLICAR NUEVO PRODUCTO
+            </button>
+        </div>
+
+        <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6" id="product-grid"></main>
+    </div>
+
+    <div id="admin-panel" class="fixed inset-0 z-[4000] bg-black/95 p-10 overflow-y-auto">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
+                <h2 class="orbitron text-2xl text-red-500">MASTER ADMIN CONTROL</h2>
+                <button onclick="toggleAdmin()" class="bg-white/10 px-6 py-2 rounded">CERRAR</button>
+            </div>
             
-            <h2 class="orbitron text-2xl text-[#00ffaa] mb-6">DETALLES DEL PRODUCTO</h2>
-            
-            <div class="flex flex-col gap-4">
-                <input type="text" id="p-name" placeholder="Nombre del Producto" class="input-nexus">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-xs mb-6 text-gray-400 uppercase">Gestión de Usuarios</h3>
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-white/5"><th class="pb-4">USUARIO</th><th class="pb-4">ESTADO</th><th class="pb-4">ACCIÓN</th></tr>
+                    </thead>
+                    <tbody id="user-admin-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-sell" class="fixed inset-0 z-[3000] bg-black/90 hidden items-center justify-center p-4">
+        <div class="glass max-w-lg w-full p-8 rounded-[40px]">
+            <h2 class="orbitron text-[#00ffaa] mb-6 uppercase">Publicar Artículo</h2>
+            <div class="space-y-4">
+                <input type="file" id="p-img" accept="image/*" class="text-xs text-gray-500 file:bg-[#00ffaa] file:border-none file:px-4 file:py-1 file:rounded file:mr-4 file:text-black">
+                <input type="text" id="p-name" placeholder="Nombre del producto" class="input-nexus">
                 <input type="number" id="p-price" placeholder="Precio ($)" class="input-nexus">
-                
-                <hr class="border-white/5 my-2">
-                <p class="text-[10px] text-gray-500 mb-1">DATOS DEL VENDEDOR</p>
-                
-                <input type="text" id="v-name" placeholder="Tu Nombre / Alias" class="input-nexus">
-                <input type="email" id="v-email" placeholder="Correo Gmail" class="input-nexus">
-                <input type="tel" id="v-phone" placeholder="WhatsApp (Ej: +57300...)" class="input-nexus">
-                
-                <button onclick="publishProduct()" class="w-full bg-[#00ffaa] text-black py-4 rounded-xl font-black orbitron mt-4">
-                    PUBLICAR AHORA
-                </button>
+                <input type="tel" id="p-wa" placeholder="WhatsApp" class="input-nexus">
+                <button onclick="saveProduct()" class="w-full bg-[#00ffaa] text-black font-black py-4 rounded-xl orbitron uppercase mt-4">Lanzar al Mercado</button>
+                <button onclick="closeSell()" class="w-full text-xs text-gray-500">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Base de Datos de Productos
-        let products = JSON.parse(localStorage.getItem('nexus_market_data')) || [
-            {
-                name: "Nvidia RTX 5090 Nexus Edition",
-                price: "2499",
-                v_name: "Admin_Zero",
-                v_email: "admin@nexus.com",
-                v_phone: "123456789",
-                date: "06/03/2026"
-            }
+        const MASTER = { u: "Maestro_Nexus_2026", k1: "Admin!_@77#_X99_Z026", k2: "Secure-Core#_9910-K_!!" };
+        let users = JSON.parse(localStorage.getItem('nx_users_v13')) || [
+            { name: "Maestro_Nexus_2026", verified: true, admin: true }
         ];
+        let products = JSON.parse(localStorage.getItem('nx_prods_v13')) || [];
+        let session = localStorage.getItem('nx_session_v13');
 
-        function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = '';
+        // --- SISTEMA DE VERIFICADO ÚNICO ---
+        function getSello(username) {
+            // Genera un código hash incopiable basado en el nombre
+            return "V-" + btoa(username).substring(0, 8).toUpperCase();
+        }
 
-            products.forEach((p, index) => {
-                grid.innerHTML += `
-                    <div class="card-prod glass p-6 rounded-[25px] flex flex-col">
-                        <div class="bg-gradient-to-br from-[#00ffaa]/20 to-transparent h-32 rounded-2xl mb-4 flex items-center justify-center">
-                            <span class="text-4xl">📦</span>
+        function login() {
+            const u = document.getElementById('u-in').value;
+            const k1 = document.getElementById('p1-in').value;
+            const k2 = document.getElementById('p2-in').value;
+
+            if(u === MASTER.u && k1 === MASTER.k1 && k2 === MASTER.k2) {
+                session = u;
+                saveSession();
+            } else if(u && k1 && k2) {
+                if(!users.find(x => x.name === u)) {
+                    users.push({ name: u, verified: false, admin: false });
+                    localStorage.setItem('nx_users_v13', JSON.stringify(users));
+                }
+                session = u;
+                saveSession();
+            }
+        }
+
+        function saveSession() {
+            localStorage.setItem('nx_session_v13', session);
+            location.reload();
+        }
+
+        if(session) {
+            document.getElementById('app').style.display = 'block';
+            if(session === MASTER.u) document.getElementById('admin-btn').classList.remove('hidden');
+            render();
+        } else {
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+
+        function render(data = products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = data.map((p, i) => {
+                const userObj = users.find(u => u.name === p.seller);
+                const isVerified = userObj && userObj.verified;
+                return `
+                    <div class="glass p-5 rounded-[30px] border border-white/5 hover:border-[#00ffaa]/50 transition-all">
+                        <img src="${p.img}" class="p-img mb-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] text-gray-500 font-bold">@${p.seller}</span>
+                            ${isVerified ? `<span class="badge-verified" title="ID: ${getSello(p.seller)}">✓ VERIFICADO</span>` : ''}
                         </div>
-                        <h3 class="orbitron text-lg font-bold mb-1">${p.name}</h3>
+                        <h3 class="orbitron text-sm font-bold truncate">${p.name}</h3>
                         <p class="text-[#00ffaa] font-black text-xl mb-4">$${p.price}</p>
-                        
-                        <div class="mt-auto pt-4 border-t border-white/5 space-y-2">
-                            <p class="text-[10px] text-gray-400">Vendedor: <span class="text-white">${p.v_name}</span></p>
-                            
-                            <div class="flex gap-2 pt-2">
-                                <a href="https://wa.me/${p.v_phone}?text=Hola%20estoy%20interesado%20en%20tu%20producto:%20${p.name}" target="_blank" 
-                                   class="flex-1 bg-green-600/20 text-green-400 text-center py-2 rounded-lg text-[10px] font-bold hover:bg-green-600 hover:text-white transition-all">
-                                   WHATSAPP
-                                </a>
-                                <a href="mailto:${p.v_email}?subject=Interés en producto: ${p.name}" 
-                                   class="flex-1 bg-blue-600/20 text-blue-400 text-center py-2 rounded-lg text-[10px] font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                   GMAIL
-                                </a>
-                            </div>
-                            ${p.v_name === "Admin_Zero" ? '' : `<button onclick="deleteProduct(${index})" class="w-full text-[9px] text-red-500 mt-2 opacity-30 hover:opacity-100">BORRAR PUBLICACIÓN</button>`}
-                        </div>
+                        <a href="https://wa.me/${p.wa}" target="_blank" class="block w-full bg-white/5 text-center py-2 rounded-lg text-[10px] font-black hover:bg-[#00ffaa] hover:text-black transition-all uppercase">Contactar Vendedor</a>
                     </div>
                 `;
-            });
+            }).join('');
         }
 
-        function publishProduct() {
+        function search() {
+            const val = document.getElementById('search-bar').value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(val) || 
+                p.seller.toLowerCase().includes(val)
+            );
+            render(filtered);
+        }
+
+        // --- ADMIN PANEL ---
+        function toggleAdmin() {
+            const p = document.getElementById('admin-panel');
+            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+            if(p.style.display === 'block') renderAdminUsers();
+        }
+
+        function renderAdminUsers() {
+            const list = document.getElementById('user-admin-list');
+            list.innerHTML = users.map(u => `
+                <tr class="border-b border-white/5">
+                    <td class="py-4 font-bold ${u.admin ? 'text-red-500' : ''}">${u.name}</td>
+                    <td class="py-4 text-[10px]">${u.verified ? '<span class="text-[#00ffaa]">✓ VERIFICADO</span>' : '<span class="text-gray-600">PENDIENTE</span>'}</td>
+                    <td class="py-4">
+                        <button onclick="toggleVerify('${u.name}')" class="bg-white/10 px-3 py-1 rounded text-[9px] uppercase">
+                            ${u.verified ? 'Quitar Verificado' : 'Dar Verificado'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleVerify(name) {
+            users = users.map(u => u.name === name ? {...u, verified: !u.verified} : u);
+            localStorage.setItem('nx_users_v13', JSON.stringify(users));
+            renderAdminUsers();
+            render();
+        }
+
+        // --- VENTAS ---
+        function openSell() { document.getElementById('modal-sell').style.display = 'flex'; }
+        function closeSell() { document.getElementById('modal-sell').style.display = 'none'; }
+
+        function saveProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
-            const v_name = document.getElementById('v-name').value;
-            const v_email = document.getElementById('v-email').value;
-            const v_phone = document.getElementById('v-phone').value;
+            const wa = document.getElementById('p-wa').value;
+            const file = document.getElementById('p-img').files[0];
 
-            if(!name || !price || !v_name || !v_email || !v_phone) {
-                return alert("⚠️ Por favor rellena todos los campos.");
-            }
+            if(!name || !price || !file) return alert("Faltan datos");
 
-            const newProduct = {
-                name, price, v_name, v_email, v_phone,
-                date: new Date().toLocaleDateString()
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                products.unshift({ name, price, wa, img: e.target.result, seller: session });
+                localStorage.setItem('nx_prods_v13', JSON.stringify(products));
+                render();
+                closeSell();
             };
-
-            products.unshift(newProduct);
-            localStorage.setItem('nexus_market_data', JSON.stringify(products));
-            
-            // Limpiar y cerrar
-            renderProducts();
-            toggleSell(false);
-            alert("✅ ¡Producto publicado con éxito!");
-            
-            document.getElementById('p-name').value = "";
-            document.getElementById('p-price').value = "";
+            reader.readAsDataURL(file);
         }
 
-        function deleteProduct(index) {
-            if(confirm("¿Seguro que quieres quitar este producto?")) {
-                products.splice(index, 1);
-                localStorage.setItem('nexus_market_data', JSON.stringify(products));
-                renderProducts();
-            }
-        }
-
-        function toggleSell(show) {
-            document.getElementById('modal-sell').style.display = show ? 'flex' : 'none';
-        }
-
-        // Carga inicial
-        renderProducts();
+        function logout() { localStorage.removeItem('nx_session_v13'); location.reload(); }
     </script>
 </body>
 </html>
