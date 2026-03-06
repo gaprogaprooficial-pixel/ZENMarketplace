@@ -2,252 +2,149 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS MULTIVERSE 3D | v11.0 MASTER</title>
+    <title>NEXUS MARKET | Vende y Compra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap');
-        body { background: #000; color: white; font-family: 'JetBrains Mono', monospace; overflow: hidden; margin: 0; }
+        body { background: #0a0a0a; color: white; font-family: 'JetBrains Mono', monospace; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        
-        /* MOTOR 3D PSEUDO */
-        #viewport { width: 100vw; height: 100vh; perspective: 1000px; background: radial-gradient(circle, #111 0%, #000 100%); }
-        #world { 
-            position: absolute; width: 2000px; height: 2000px; 
-            transform-style: preserve-3d; transition: transform 0.1s ease-out;
-            background-size: 50px 50px;
-            background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
-        }
-
-        /* ENTIDADES */
-        .cube { 
-            position: absolute; width: 50px; height: 50px; transform-style: preserve-3d; 
-            transition: 0.2s; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .player { 
-            width: 40px; height: 40px; background: #00ffaa; position: absolute; 
-            z-index: 100; box-shadow: 0 0 30px #00ffaa; border-radius: 8px;
-            transform: translateZ(20px);
-        }
-
-        /* INTERFAZ */
-        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,170,0.2); }
-        .input-n { background: rgba(255,255,255,0.05); border: 1px solid #00ffaa; padding: 10px; border-radius: 8px; color: white; outline: none; }
-        
-        #ui-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-        .interactive { pointer-events: auto; }
-        #login-screen, #admin-panel, #mod-menu { display: none; }
-        
-        /* MODS VIZ */
-        .mod-active { color: #00ffaa; text-shadow: 0 0 10px #00ffaa; }
-        .b-wall { background: #333; transform: translateZ(25px); border: 2px solid #444; }
-        .b-lava { background: #ff4400; box-shadow: inset 0 0 20px #000; }
-        .bubble { position: absolute; background: white; color: black; padding: 4px 8px; border-radius: 8px; font-size: 10px; bottom: 50px; white-space: nowrap; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(0, 255, 170, 0.1); }
+        .input-nexus { background: #151515; border: 1px solid #333; padding: 12px; border-radius: 10px; color: white; outline: none; transition: 0.3s; }
+        .input-nexus:focus { border-color: #00ffaa; box-shadow: 0 0 10px rgba(0, 255, 170, 0.2); }
+        .card-prod { transition: 0.3s; border: 1px solid #222; }
+        .card-prod:hover { transform: translateY(-5px); border-color: #00ffaa; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        #modal-sell { display: none; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-<div id="viewport">
-    <div id="world">
-        <div id="player" class="player"><div id="p-bubble" class="bubble" style="display:none"></div></div>
-    </div>
-</div>
+    <header class="max-w-7xl mx-auto flex justify-between items-center mb-12">
+        <div>
+            <h1 class="orbitron text-3xl font-black text-[#00ffaa] italic">NEXUS MARKET</h1>
+            <p class="text-[10px] text-gray-500 tracking-[0.3em]">SISTEMA DE COMERCIO GLOBAL 2026</p>
+        </div>
+        <button onclick="toggleSell(true)" class="bg-[#00ffaa] text-black px-8 py-3 rounded-full font-black orbitron text-xs hover:scale-105 transition-all">
+            + PUBLICAR PRODUCTO
+        </button>
+    </header>
 
-<div id="ui-overlay">
-    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-black/90 interactive">
-        <div class="glass p-10 rounded-[40px] w-96 text-center border-t-4 border-[#00ffaa]">
-            <h1 class="orbitron text-3xl font-black mb-6 text-[#00ffaa]">NEXUS ENTRY</h1>
-            <div class="space-y-4">
-                <input type="text" id="log-u" placeholder="USUARIO" class="input-n w-full">
-                <input type="password" id="log-k1" placeholder="KEY ALFA" class="input-n w-full">
-                <input type="password" id="log-k2" placeholder="KEY BETA" class="input-n w-full">
-                <button onclick="auth()" class="w-full bg-[#00ffaa] text-black font-black py-3 rounded-xl orbitron">INICIAR SESIÓN</button>
+    <main class="max-w-7xl mx-auto">
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+    </main>
+
+    <div id="modal-sell" class="fixed inset-0 z-[1000] bg-black/90 flex items-center justify-center p-4">
+        <div class="glass w-full max-w-lg p-8 rounded-[30px] relative">
+            <button onclick="toggleSell(false)" class="absolute top-6 right-6 text-gray-500 hover:text-white">✕</button>
+            
+            <h2 class="orbitron text-2xl text-[#00ffaa] mb-6">DETALLES DEL PRODUCTO</h2>
+            
+            <div class="flex flex-col gap-4">
+                <input type="text" id="p-name" placeholder="Nombre del Producto" class="input-nexus">
+                <input type="number" id="p-price" placeholder="Precio ($)" class="input-nexus">
+                
+                <hr class="border-white/5 my-2">
+                <p class="text-[10px] text-gray-500 mb-1">DATOS DEL VENDEDOR</p>
+                
+                <input type="text" id="v-name" placeholder="Tu Nombre / Alias" class="input-nexus">
+                <input type="email" id="v-email" placeholder="Correo Gmail" class="input-nexus">
+                <input type="tel" id="v-phone" placeholder="WhatsApp (Ej: +57300...)" class="input-nexus">
+                
+                <button onclick="publishProduct()" class="w-full bg-[#00ffaa] text-black py-4 rounded-xl font-black orbitron mt-4">
+                    PUBLICAR AHORA
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="hud" class="p-6 flex justify-between items-end h-full">
-        <div class="interactive flex flex-col gap-4">
-            <div class="glass p-4 rounded-2xl w-64">
-                <div class="flex justify-between items-center mb-2">
-                    <span id="display-name" class="orbitron text-[#00ffaa] text-xs font-bold">INVITADO</span>
-                    <span class="text-yellow-500 text-[10px]">🪙 <span id="display-coins">0</span></span>
-                </div>
-                <div id="chat-box" class="h-32 overflow-y-auto text-[9px] text-gray-400 mb-2 border-b border-white/5"></div>
-                <input type="text" id="chat-in" placeholder="Presiona ENTER..." class="w-full bg-transparent text-xs outline-none">
-            </div>
-        </div>
+    <script>
+        // Base de Datos de Productos
+        let products = JSON.parse(localStorage.getItem('nexus_market_data')) || [
+            {
+                name: "Nvidia RTX 5090 Nexus Edition",
+                price: "2499",
+                v_name: "Admin_Zero",
+                v_email: "admin@nexus.com",
+                v_phone: "123456789",
+                date: "06/03/2026"
+            }
+        ];
 
-        <div class="interactive flex flex-col gap-2">
-            <button onclick="toggleMenu('mod-menu')" class="bg-blue-600 px-6 py-2 rounded-lg text-[10px] font-black orbitron">MODS & SCRIPTS</button>
-            <button id="admin-btn" onclick="toggleMenu('admin-panel')" class="hidden bg-red-600 px-6 py-2 rounded-lg text-[10px] font-black orbitron">MASTER PANEL</button>
-            <button onclick="logout()" class="bg-white/10 px-6 py-2 rounded-lg text-[10px] font-black orbitron">CERRAR SESIÓN</button>
-        </div>
-    </div>
-</div>
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
 
-<div id="admin-panel" class="fixed inset-0 bg-black/95 z-[2000] p-10 interactive">
-    <div class="flex justify-between border-b border-red-600 pb-4 mb-6">
-        <h2 class="orbitron text-2xl text-red-600">ADMIN CONTROL CENTER</h2>
-        <button onclick="toggleMenu('admin-panel')" class="text-xs">X</button>
-    </div>
-    <div class="grid grid-cols-2 gap-10">
-        <div class="glass p-6">
-            <h3 class="text-xs text-[#00ffaa] mb-4">USUARIOS CONECTADOS</h3>
-            <div id="admin-user-list" class="space-y-2"></div>
-        </div>
-        <div class="glass p-6">
-            <h3 class="text-xs text-red-500 mb-4">COMANDOS GLOBALES</h3>
-            <button onclick="globalAlert()" class="w-full bg-red-600 py-2 rounded mb-2 text-xs">ALERTA PANTALLA COMPLETA</button>
-            <button onclick="toggleMaint()" class="w-full bg-yellow-600 py-2 rounded text-xs">ALTERNAR MANTENIMIENTO</button>
-        </div>
-    </div>
-</div>
+            products.forEach((p, index) => {
+                grid.innerHTML += `
+                    <div class="card-prod glass p-6 rounded-[25px] flex flex-col">
+                        <div class="bg-gradient-to-br from-[#00ffaa]/20 to-transparent h-32 rounded-2xl mb-4 flex items-center justify-center">
+                            <span class="text-4xl">📦</span>
+                        </div>
+                        <h3 class="orbitron text-lg font-bold mb-1">${p.name}</h3>
+                        <p class="text-[#00ffaa] font-black text-xl mb-4">$${p.price}</p>
+                        
+                        <div class="mt-auto pt-4 border-t border-white/5 space-y-2">
+                            <p class="text-[10px] text-gray-400">Vendedor: <span class="text-white">${p.v_name}</span></p>
+                            
+                            <div class="flex gap-2 pt-2">
+                                <a href="https://wa.me/${p.v_phone}?text=Hola%20estoy%20interesado%20en%20tu%20producto:%20${p.name}" target="_blank" 
+                                   class="flex-1 bg-green-600/20 text-green-400 text-center py-2 rounded-lg text-[10px] font-bold hover:bg-green-600 hover:text-white transition-all">
+                                   WHATSAPP
+                                </a>
+                                <a href="mailto:${p.v_email}?subject=Interés en producto: ${p.name}" 
+                                   class="flex-1 bg-blue-600/20 text-blue-400 text-center py-2 rounded-lg text-[10px] font-bold hover:bg-blue-600 hover:text-white transition-all">
+                                   GMAIL
+                                </a>
+                            </div>
+                            ${p.v_name === "Admin_Zero" ? '' : `<button onclick="deleteProduct(${index})" class="w-full text-[9px] text-red-500 mt-2 opacity-30 hover:opacity-100">BORRAR PUBLICACIÓN</button>`}
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-<div id="mod-menu" class="fixed right-6 top-1/4 glass p-6 w-64 rounded-2xl interactive">
-    <h3 class="orbitron text-[#00ffaa] text-xs mb-4">MODS DISPONIBLES</h3>
-    <div class="space-y-3">
-        <button onclick="activateMod('speed')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">FLASH SPEED (50 Coins)</button>
-        <button onclick="activateMod('ghost')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">GHOST MODE (100 Coins)</button>
-        <button onclick="activateMod('build')" class="w-full text-left text-[10px] p-2 border border-white/10 rounded">FAST BUILDER (Free)</button>
-    </div>
-</div>
+        function publishProduct() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const v_name = document.getElementById('v-name').value;
+            const v_email = document.getElementById('v-email').value;
+            const v_phone = document.getElementById('v-phone').value;
 
-<script>
-// --- CORE ---
-let users = JSON.parse(localStorage.getItem('nx_u')) || [
-    { name: "Maestro_Nexus_2026", k1: "Admin!_@77#_X99_Z026", k2: "Secure-Core#_9910-K_!!", isAdmin: true, coins: 999999 }
-];
-let worldBlocks = JSON.parse(localStorage.getItem('nx_w')) || [];
-let current = null;
-let posX = 500, posY = 500;
-let speed = 10;
+            if(!name || !price || !v_name || !v_email || !v_phone) {
+                return alert("⚠️ Por favor rellena todos los campos.");
+            }
 
-// --- AUTH ---
-function auth() {
-    const u = document.getElementById('log-u').value;
-    const k1 = document.getElementById('log-k1').value;
-    const k2 = document.getElementById('log-k2').value;
-    const found = users.find(x => x.name === u && x.k1 === k1 && x.k2 === k2);
+            const newProduct = {
+                name, price, v_name, v_email, v_phone,
+                date: new Date().toLocaleDateString()
+            };
 
-    if(found) {
-        current = found;
-        document.getElementById('login-screen').style.display = 'none';
-        initGame();
-    } else {
-        // Registro automático si no existe
-        let newUser = { name: u, k1: k1, k2: k2, isAdmin: false, coins: 100 };
-        users.push(newUser);
-        current = newUser;
-        localStorage.setItem('nx_u', JSON.stringify(users));
-        document.getElementById('login-screen').style.display = 'none';
-        initGame();
-    }
-}
+            products.unshift(newProduct);
+            localStorage.setItem('nexus_market_data', JSON.stringify(products));
+            
+            // Limpiar y cerrar
+            renderProducts();
+            toggleSell(false);
+            alert("✅ ¡Producto publicado con éxito!");
+            
+            document.getElementById('p-name').value = "";
+            document.getElementById('p-price').value = "";
+        }
 
-function initGame() {
-    document.getElementById('display-name').innerText = current.name;
-    document.getElementById('display-coins').innerText = current.coins;
-    if(current.isAdmin) document.getElementById('admin-btn').style.display = 'block';
-    renderWorld();
-    updateCam();
-}
+        function deleteProduct(index) {
+            if(confirm("¿Seguro que quieres quitar este producto?")) {
+                products.splice(index, 1);
+                localStorage.setItem('nexus_market_data', JSON.stringify(products));
+                renderProducts();
+            }
+        }
 
-// --- MOTOR DE JUEGO & CÁMARA ---
-function updateCam() {
-    const world = document.getElementById('world');
-    const p = document.getElementById('player');
-    // Seguimiento de cámara
-    world.style.transform = `rotateX(45deg) rotateZ(0deg) translate3d(${-posX + window.innerWidth/2}px, ${-posY + window.innerHeight/2}px, 0)`;
-    p.style.left = posX + 'px';
-    p.style.top = posY + 'px';
-}
+        function toggleSell(show) {
+            document.getElementById('modal-sell').style.display = show ? 'flex' : 'none';
+        }
 
-window.addEventListener('keydown', (e) => {
-    if(!current || document.activeElement.tagName === 'INPUT') return;
-    if(e.key === 'w' || e.key === 'ArrowUp') posY -= speed;
-    if(e.key === 's' || e.key === 'ArrowDown') posY += speed;
-    if(e.key === 'a' || e.key === 'ArrowLeft') posX -= speed;
-    if(e.key === 'd' || e.key === 'ArrowRight') posX += speed;
-    updateCam();
-});
-
-// --- CHAT ---
-document.getElementById('chat-in').onkeypress = function(e) {
-    if(e.key === 'Enter' && this.value !== "") {
-        const bubble = document.getElementById('p-bubble');
-        bubble.innerText = this.value;
-        bubble.style.display = 'block';
-        const log = document.createElement('div');
-        log.innerHTML = `<b>${current.name}:</b> ${this.value}`;
-        document.getElementById('chat-box').appendChild(log);
-        document.getElementById('chat-box').scrollTop = 9999;
-        setTimeout(() => bubble.style.display = 'none', 3000);
-        this.value = "";
-    }
-};
-
-// --- MODS ---
-function activateMod(type) {
-    if(type === 'speed') {
-        if(current.coins < 50) return alert("Pobre");
-        speed = 30;
-        current.coins -= 50;
-        alert("MOD: SUPER VELOCIDAD ACTIVADA");
-    }
-    if(type === 'build') {
-        alert("MOD: Clic en el suelo para colocar muros (Gratis Admin)");
-        window.onclick = (e) => {
-            const wx = Math.floor(posX / 50) * 50;
-            const wy = Math.floor(posY / 50) * 50;
-            worldBlocks.push({x: wx, y: wy, type: 'b-wall'});
-            renderWorld();
-        };
-    }
-    document.getElementById('display-coins').innerText = current.coins;
-}
-
-function renderWorld() {
-    const w = document.getElementById('world');
-    const p = document.getElementById('player');
-    w.innerHTML = ''; 
-    w.appendChild(p);
-    worldBlocks.forEach(b => {
-        const el = document.createElement('div');
-        el.className = `cube ${b.type}`;
-        el.style.left = b.x + 'px';
-        el.style.top = b.y + 'px';
-        w.appendChild(el);
-    });
-}
-
-// --- ADMIN ---
-function toggleMenu(id) {
-    const el = document.getElementById(id);
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-    if(id === 'admin-panel') {
-        document.getElementById('admin-user-list').innerHTML = users.map(u => `
-            <div class="flex justify-between text-[10px] bg-white/5 p-2 rounded">
-                <span>${u.name} (Coins: ${u.coins})</span>
-                <span class="text-gray-500">${u.k1} | ${u.k2}</span>
-                <button onclick="ban('${u.name}')" class="text-red-500">BAN</button>
-            </div>
-        `).join('');
-    }
-}
-
-function globalAlert() {
-    const m = prompt("MENSAJE GLOBAL:");
-    alert("📢 ALERTA GLOBAL: " + m);
-}
-
-function logout() { location.reload(); }
-function toggleMenu(id) {
-    const m = document.getElementById(id);
-    m.style.display = (m.style.display === 'block') ? 'none' : 'block';
-}
-
-// Mostrar Login al inicio
-document.getElementById('login-screen').style.display = 'flex';
-</script>
+        // Carga inicial
+        renderProducts();
+    </script>
 </body>
 </html>
